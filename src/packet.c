@@ -76,17 +76,56 @@ packet_GetHeaderLength(Packet *packet)
     return getHeaderLength(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
 }
 
-// absolute packet fields
+// Absolute packet fields
 Buffer *
-packet_GetFieldType(Packet *packet, PacketField field)
+packet_GetFieldLength(Packet *packet, PacketField field)
 {
-    // TODO
+    switch (field) {
+        PacketField_Name:
+            return _getNameLength(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
+        PacketField_ContentObjectHashRestriction:
+            return _getContentHashLength(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
+        PacketField_KeyIdRestriction:
+            break;
+        PacketField_Payload:
+            break;
+        PacketField_ValidationAlgCert:
+            break;
+        PacketField_ValidationAlgKeyId:
+            break;
+        PacketField_ValidationAlgPublicKey:
+            break;
+        PacketField_ValidationAlgSigTime:
+            break;
+        PacketField_ValidationPayload:
+            break;
+    }
     return NULL;
 }
 
 Buffer *
 packet_GetFieldValue(Packet *packet, PacketField field)
 {
+    switch (field) {
+        PacketField_Name:
+            return _readName(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
+        PacketField_ContentObjectHashRestriction:
+            return _readContentObjectHash(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
+        PacketField_KeyIdRestriction:
+            break;
+        PacketField_Payload:
+            break;
+        PacketField_ValidationAlgCert:
+            break;
+        PacketField_ValidationAlgKeyId:
+            break;
+        PacketField_ValidationAlgPublicKey:
+            break;
+        PacketField_ValidationAlgSigTime:
+            break;
+        PacketField_ValidationPayload:
+            break;
+    }
     return NULL;
 }
 

@@ -33,7 +33,7 @@ typedef enum {
     PacketField_KeyIdRestriction,
     PacketField_ContentObjectHashRestriction,
 
-    // Message
+    // Message internals (payload)
     PacketField_Payload,
 
     // ValidationAlgorithm
@@ -58,7 +58,7 @@ uint16_t packet_GetLength(Packet *packet);
 uint16_t packet_GetHeaderLength(Packet *packet);
 
 // absolute packet fields
-Buffer *packet_GetFieldType(Packet *packet, PacketField field);
+Buffer *packet_GetFieldLength(Packet *packet, PacketField field);
 Buffer *packet_GetFieldValue(Packet *packet, PacketField field);
 
 // TLV iterator functions

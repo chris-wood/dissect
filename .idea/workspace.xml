@@ -13,10 +13,7 @@
     </ADDITIONAL_GENERATION_ENVIRONMENT>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="50a6c7e1-ee8d-4dc2-bb4a-6c2b213f19ce" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/packet.c" afterPath="$PROJECT_DIR$/src/packet.c" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/packet.h" afterPath="$PROJECT_DIR$/src/packet.h" />
-    </list>
+    <list default="true" id="50a6c7e1-ee8d-4dc2-bb4a-6c2b213f19ce" name="Default" comment="" />
     <ignored path="dissect.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />

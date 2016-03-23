@@ -2,6 +2,7 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/test/test_packet.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/buffer.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/dissect.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/parser.c" isTestSource="false" />
@@ -378,6 +379,7 @@
           <root url="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/7.0.2/include" />
         </SOURCES>
         <excluded>
+          <root url="file://$MODULE_DIR$/src/test/test_packet.c" />
           <root url="file://$MODULE_DIR$/src/buffer.h" />
           <root url="file://$MODULE_DIR$/src/dissect.c" />
           <root url="file://$MODULE_DIR$/src/parser.c" />

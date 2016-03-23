@@ -12,5 +12,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 include_directories(src)
 
 add_library(libdissect ${SOURCE_FILES})
-add_executable(dissect src/dissect.c ${SOURCE_FILES} src/parser.h)
+add_executable(dissect src/dissect.c)
+target_link_libraries(dissect libdissect)
+
+add_executable(test_packet src/test/test_packet.c)
+target_link_libraries(test_packet libdissect cmocka)
 

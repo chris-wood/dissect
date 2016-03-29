@@ -10,13 +10,14 @@
 struct packet {
     size_t offset;
     Buffer *packet;
-    TLV *startTlv;
+    TLV *startTLV;
 };
 
 struct tlv {
     uint16_t type;
     uint16_t length;
-    BufferOverlay *overlay;
+    BufferOverlay *value;
+    struct tlv *nextTLV;
 };
 
 static TLV *
@@ -25,8 +26,30 @@ tlv_Create(Packet *packet, uint16_t offset, uint16_t type, uint16_t length)
     TLV *tlv = (TLV *) malloc(sizeof(TLV));
     tlv->type = type;
     tlv->length = length;
-    tlv->overlay = bufferOverlay_CreateFromBuffer(packet->packet, offset, length);
+    tlv->value = bufferOverlay_CreateFromBuffer(packet->packet, offset, length);
     return tlv;
+}
+
+// TLV iterator functions
+TLV *
+packet_GetNextTLV(Packet *packet)
+{
+    if (packet_HasNextTLV(packet)) {
+        uint16_t type = getWordFromOffset(buffer_Overlay(packet->packet), packet->offset);
+        packet->offset += 2;
+
+        uint16_t length = getWordFromOffset(buffer_Overlay(packet->packet), packet->offset);
+        packet->offset += 2;
+
+        TLV *tlv  = tlv_Create(type, length, packet, packet->offset);
+        packet->offset += length;
+
+        tlv->nextTLV = NULL;
+
+        return tlv;
+    } else {
+        return NULL;
+    }
 }
 
 Packet *
@@ -36,10 +59,14 @@ packet_CreateFromBuffer(Buffer *buffer)
     packet->offset = 0;
     packet->packet = buffer;
 
-    // The first TLV is right after the fixed header, which is 8 bytes long
-    uint16_t firstTlvType = buffer_GetUint16(packet->packet, 8);
-    uint16_t firstTlvLength = buffer_GetUint16(packet->packet, 10);
-    packet->startTlv = tlv_Create(packet, 12, firstTlvType, firstTlvLength);
+    // Create the list of TLVs
+    packet->startTLV = packet_GetNextTLV(packet);
+    TLV *prev = packet->startTLV;
+    while (packet_HasNextTLV(packet)) {
+        TLV *nextTLV = packet_GetNextTLV(packet);
+        prev->nextTLV = nextTLV;
+        prev = nextTLV;
+    }
 
     return packet;
 }
@@ -110,42 +137,33 @@ packet_GetFieldValue(Packet *packet, PacketField field)
     return NULL;
 }
 
-// TLV iterator functions
-TLV *
-packet_GetNextTLV(Packet *packet)
-{
-    if (packet_HasNextTLV(packet)) {
-        uint16_t type = getWordFromOffset(buffer_Overlay(packet->packet), packet->offset);
-        packet->offset += 2;
-
-        uint16_t length = getWordFromOffset(buffer_Overlay(packet->packet), packet->offset);
-        packet->offset += 2;
-
-        TLV *tlv  = tlv_Create(type, length, packet, packet->offset);
-        packet->offset += length;
-
-        return tlv;
-    } else {
-        return NULL;
-    }
-}
-
 bool
 packet_HasNextTLV(Packet *packet)
 {
     return (packet->offset < buffer_Size(packet->packet));
 }
 
-// TODO: this should return the first TLV of the specified type
-// TODO: a user can provide a hierarchy of types (as an array) -- to do a DFS for the type (since each type has its own namespace)
-//TLV *
-//packet_FindTLV(Packet *packet, uint16_t type)
-//{
-//    TLV *start = packet->startTlv;
-//    if (start->type == type) {
-//
-//    }
-//}
+// This function should take bounds for the search so we can re-use it for the nested TLV search
+TLV *
+packet_FindTLV(Packet *packet, uint16_t type)
+{
+    TLV *curr = packet->startTLV;
+
+    while (curr != NULL) {
+        if (curr->type == type) {
+            return curr;
+        }
+        curr = curr->nextTLV;
+    }
+
+    return NULL;
+}
+
+TLV *
+packet_FindNestedTLV(Packet *packet, uint32_t numberOfTypes, uint16_t type[numberOfTypes])
+{
+    return NULL;
+}
 
 uint16_t
 tlv_Type(TLV *tlv)
@@ -162,5 +180,5 @@ tlv_Length(TLV *tlv)
 uint8_t *
 tlv_Value(TLV *tlv)
 {
-    return bufferOverlay_Overlay(tlv->overlay);
+    return bufferOverlay_Overlay(tlv->value);
 }

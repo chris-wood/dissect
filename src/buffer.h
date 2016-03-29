@@ -17,6 +17,7 @@ typedef struct buffer_overlay BufferOverlay;
 
 BufferOverlay *bufferOverlay_CreateFromBuffer(Buffer *b, uint32_t offset, uint32_t length);
 uint8_t *bufferOverlay_Overlay(BufferOverlay *overlay);
+uint32_t bufferOverlay_Length(BufferOverlay *overlay);
 
 void buffer_Display(FILE *fp, Buffer *b);
 Buffer *buffer_CreateEmpty();

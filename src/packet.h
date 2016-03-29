@@ -60,9 +60,13 @@ uint16_t packet_GetHeaderLength(Packet *packet);
 // absolute packet fields
 Buffer *packet_GetFieldValue(Packet *packet, PacketField field);
 
-// TLV iterator functions
+// TLV iterator and query functions
 TLV *packet_GetNextTLV(Packet *packet);
 bool packet_HasNextTLV(Packet *packet);
+TLV *packet_FindTLV(Packet *packet, uint16_t type);
+TLV *packet_FindNestedTLV(Packet *packet, uint32_t numberOfTypes, uint16_t type[numberOfTypes]);
+
+// Packet query functions
 
 uint16_t tlv_Type(TLV *tlv);
 uint16_t tlv_Length(TLV *tlv);

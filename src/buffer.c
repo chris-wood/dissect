@@ -13,7 +13,6 @@ struct buffer {
 struct buffer_overlay {
     uint8_t *bytes;
     uint32_t length;
-    uint32_t offset;
 };
 
 BufferOverlay *
@@ -21,8 +20,7 @@ bufferOverlay_CreateFromBuffer(Buffer *b, uint32_t offset, uint32_t length)
 {
     BufferOverlay *overlay = (BufferOverlay *) malloc(sizeof(BufferOverlay));
 
-    overlay->bytes = b->bytes;
-    overlay->offset = offset;
+    overlay->bytes = b->bytes + offset;
     overlay->length = length;
 
     return overlay;
@@ -31,7 +29,13 @@ bufferOverlay_CreateFromBuffer(Buffer *b, uint32_t offset, uint32_t length)
 uint8_t *
 bufferOverlay_Overlay(BufferOverlay *overlay)
 {
-    return (uint8_t *) (overlay->bytes + overlay->offset);
+    return overlay->bytes;
+}
+
+uint32_t
+bufferOverlay_Length(BufferOverlay *overlay)
+{
+    return overlay->length;
 }
 
 void

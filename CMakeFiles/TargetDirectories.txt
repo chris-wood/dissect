@@ -1,0 +1,3 @@
+/Users/cwood/Projects/dissect/CMakeFiles/dissect.dir
+/Users/cwood/Projects/dissect/CMakeFiles/test_packet.dir
+/Users/cwood/Projects/dissect/CMakeFiles/libdissect.dir

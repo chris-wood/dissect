@@ -27,4 +27,10 @@ int buffer_Compare(Buffer *this, Buffer *other);
 size_t buffer_Size(Buffer *buffer);
 uint8_t *buffer_Overlay(Buffer *buffer);
 
+uint64_t buffer_GetUint64(Buffer *buffer, size_t offset);
+uint32_t buffer_GetUint32(Buffer *buffer, size_t offset);
+uint16_t buffer_GetUint16(Buffer *buffer, size_t offset);
+uint8_t buffer_GetUint8(Buffer *buffer, size_t offset);
+
+
 #endif // DISSECT_BUFFER_H

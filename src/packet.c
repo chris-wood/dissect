@@ -10,6 +10,7 @@
 struct packet {
     size_t offset;
     Buffer *packet;
+    TLV *startTlv;
 };
 
 struct tlv {
@@ -19,12 +20,12 @@ struct tlv {
 };
 
 static TLV *
-tlv_Create(uint16_t type, uint16_t length, Packet *packet)
+tlv_Create(Packet *packet, uint16_t offset, uint16_t type, uint16_t length)
 {
     TLV *tlv = (TLV *) malloc(sizeof(TLV));
     tlv->type = type;
     tlv->length = length;
-    tlv->overlay = bufferOverlay_CreateFromBuffer(packet->packet, packet->offset, length);
+    tlv->overlay = bufferOverlay_CreateFromBuffer(packet->packet, offset, length);
     return tlv;
 }
 
@@ -34,6 +35,12 @@ packet_CreateFromBuffer(Buffer *buffer)
     Packet *packet = (Packet *) malloc(sizeof(packet));
     packet->offset = 0;
     packet->packet = buffer;
+
+    // The first TLV is right after the fixed header, which is 8 bytes long
+    uint16_t firstTlvType = buffer_GetUint16(packet->packet, 8);
+    uint16_t firstTlvLength = buffer_GetUint16(packet->packet, 10);
+    packet->startTlv = tlv_Create(packet, 12, firstTlvType, firstTlvLength);
+
     return packet;
 }
 
@@ -78,32 +85,6 @@ packet_GetHeaderLength(Packet *packet)
 
 // Absolute packet fields
 Buffer *
-packet_GetFieldLength(Packet *packet, PacketField field)
-{
-    switch (field) {
-        PacketField_Name:
-            return _getNameLength(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
-        PacketField_ContentObjectHashRestriction:
-            return _getContentHashLength(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
-        PacketField_KeyIdRestriction:
-            break;
-        PacketField_Payload:
-            break;
-        PacketField_ValidationAlgCert:
-            break;
-        PacketField_ValidationAlgKeyId:
-            break;
-        PacketField_ValidationAlgPublicKey:
-            break;
-        PacketField_ValidationAlgSigTime:
-            break;
-        PacketField_ValidationPayload:
-            break;
-    }
-    return NULL;
-}
-
-Buffer *
 packet_GetFieldValue(Packet *packet, PacketField field)
 {
     switch (field) {
@@ -140,7 +121,7 @@ packet_GetNextTLV(Packet *packet)
         uint16_t length = getWordFromOffset(buffer_Overlay(packet->packet), packet->offset);
         packet->offset += 2;
 
-        TLV *tlv  = tlv_Create(type, length, packet);
+        TLV *tlv  = tlv_Create(type, length, packet, packet->offset);
         packet->offset += length;
 
         return tlv;
@@ -154,6 +135,17 @@ packet_HasNextTLV(Packet *packet)
 {
     return (packet->offset < buffer_Size(packet->packet));
 }
+
+// TODO: this should return the first TLV of the specified type
+// TODO: a user can provide a hierarchy of types (as an array) -- to do a DFS for the type (since each type has its own namespace)
+//TLV *
+//packet_FindTLV(Packet *packet, uint16_t type)
+//{
+//    TLV *start = packet->startTlv;
+//    if (start->type == type) {
+//
+//    }
+//}
 
 uint16_t
 tlv_Type(TLV *tlv)

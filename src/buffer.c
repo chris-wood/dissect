@@ -96,3 +96,28 @@ buffer_Overlay(Buffer *buffer)
 {
     return buffer->bytes;
 }
+
+uint64_t
+buffer_GetUint64(Buffer *buffer, size_t offset)
+{
+    return 0;
+}
+
+uint32_t
+buffer_GetUint32(Buffer *buffer, size_t offset)
+{
+    return 0;
+}
+
+uint16_t
+buffer_GetUint16(Buffer *buffer, size_t offset)
+{
+    uint16_t value = ((uint16_t)(buffer->bytes[offset]) << 8) | (uint16_t)(buffer->bytes[offset + 1]);
+    return value;
+}
+
+uint8_t
+buffer_GetUint8(Buffer *buffer, size_t offset)
+{
+    return 0;
+}

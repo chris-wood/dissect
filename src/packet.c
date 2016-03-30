@@ -14,10 +14,18 @@ struct packet {
 };
 
 struct tlv {
+    // The type and length of thi TLV
     uint16_t type;
     uint16_t length;
+
+    // Overlay onto packet buffer that stores the value
     BufferOverlay *value;
-    struct tlv *nextTLV;
+
+    // The offset of this TLV in the packet buffer
+    uint32_t offset;
+
+    // Pointer to the next TLV in the packet
+    struct tlv **children;
 };
 
 static TLV *
@@ -26,6 +34,7 @@ tlv_Create(Packet *packet, uint16_t offset, uint16_t type, uint16_t length)
     TLV *tlv = (TLV *) malloc(sizeof(TLV));
     tlv->type = type;
     tlv->length = length;
+    tlv->offset = offset;
     tlv->value = bufferOverlay_CreateFromBuffer(packet->packet, offset, length);
     return tlv;
 }
@@ -44,7 +53,7 @@ packet_GetNextTLV(Packet *packet)
         TLV *tlv  = tlv_Create(type, length, packet, packet->offset);
         packet->offset += length;
 
-        tlv->nextTLV = NULL;
+        tlv->children = NULL;
 
         return tlv;
     } else {
@@ -59,12 +68,14 @@ packet_CreateFromBuffer(Buffer *buffer)
     packet->offset = 0;
     packet->packet = buffer;
 
-    // Create the list of TLVs
+    // Create the *tree* of TLVs
     packet->startTLV = packet_GetNextTLV(packet);
     TLV *prev = packet->startTLV;
     while (packet_HasNextTLV(packet)) {
         TLV *nextTLV = packet_GetNextTLV(packet);
-        prev->nextTLV = nextTLV;
+
+
+//        prev->nextTLV = nextTLV;
         prev = nextTLV;
     }
 
@@ -143,11 +154,11 @@ packet_HasNextTLV(Packet *packet)
     return (packet->offset < buffer_Size(packet->packet));
 }
 
-// This function should take bounds for the search so we can re-use it for the nested TLV search
-TLV *
-packet_FindTLV(Packet *packet, uint16_t type)
+static TLV *
+_packet_FindTLVInBounds(Packet *packet, uint16_t type, uint32_t low, uint32_t high)
 {
     TLV *curr = packet->startTLV;
+    uint32_t offset = 0;
 
     while (curr != NULL) {
         if (curr->type == type) {
@@ -157,6 +168,13 @@ packet_FindTLV(Packet *packet, uint16_t type)
     }
 
     return NULL;
+}
+
+// This function should take bounds for the search so we can re-use it for the nested TLV search
+TLV *
+packet_FindTLV(Packet *packet, uint16_t type)
+{
+
 }
 
 TLV *

@@ -36,6 +36,8 @@ _readFile(char *fname, uint8_t **array, size_t *length)
     size_t size = _fileSize(fname);
     
     FILE *fp = fopen(fname, "rb");    
+    assert_true(fp != NULL);
+
     *array = (uint8_t *) malloc(size);
 
     uint8_t numRead = fread(*array, 1, size, fp);
@@ -57,8 +59,8 @@ static void test_packet_Create(void **state)
         Buffer *buffer = buffer_CreateFromArray(array, length);
         Packet *packet= packet_CreateFromBuffer(buffer);
         assert_true(packet != NULL);
-
-
+    
+        
     } else {
         assert_true(false);
     }

@@ -5,8 +5,6 @@
 #ifndef DISSECT_UTIL_H
 #define DISSECT_UTIL_H
 
-typedef int bool;
-#define true 1
-#define false 0
+#include <stdbool.h>
 
 #endif //DISSECT_UTIL_H

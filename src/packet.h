@@ -63,7 +63,7 @@ Buffer *packet_GetFieldValue(Packet *packet, PacketField field);
 // TLV iterator and query functions
 TLV *packet_GetNextTLV(Packet *packet, uint32_t offset, uint32_t length);
 bool packet_HasNextTLV(Packet *packet, uint32_t offset);
-TLV *packet_FindTLV(Packet *packet, uint16_t type);
+//TLV *packet_FindTLV(TLV *tlv, uint16_t type);
 TLV *packet_FindNestedTLV(Packet *packet, uint32_t numberOfTypes, uint16_t type[numberOfTypes]);
 
 // Packet query functions

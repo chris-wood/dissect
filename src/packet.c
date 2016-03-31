@@ -25,6 +25,9 @@ struct tlv {
 
     // Pointer to the next TLV in the packet
     struct tlv *sibling;
+
+    // Pointer to inner (children) TLVs contained inside the value
+    // of this packet
     struct tlv **children;
     size_t numberOfChildren;
 };
@@ -55,7 +58,7 @@ tlv_HasInnerTLV(TLV *tlv, uint32_t limit)
     uint16_t length = getWordFromOffset(bufferOverlay_Overlay(tlv->value), 2);
 
     // If the length of the inner TLV is less than the limit, then there *could*
-    // be another TLV inside. 
+    // be another TLV inside.
     if (length < limit) {
         return true;
     } else {
@@ -64,25 +67,26 @@ tlv_HasInnerTLV(TLV *tlv, uint32_t limit)
 }
 
 static TLV *
-tlv_Create(Packet *packet, uint16_t type, uint16_t length, uint32_t offset)
+tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset)
 {
     TLV *tlv = (TLV *) malloc(sizeof(TLV));
     tlv->type = type;
     tlv->length = length;
 
     tlv->offset = offset;
-    tlv->value = bufferOverlay_CreateFromBuffer(packet->packet, offset, length);
+    tlv->value = bufferOverlay_CreateFromBuffer(packet, offset, length);
 
     if (tlv_HasInnerTLV(tlv, length)) {
         // Attempt to create an array of children. Rewind and fail if something goes wrong.
         tlv->children = (TLV **) malloc(sizeof(TLV *));
         tlv->numberOfChildren = 0;
+
         while (offset < length) {
-            uint16_t inner_type = getWordFromOffset(buffer_Overlay(tlv->value), offset);
-            uint16_t inner_length = getWordFromOffset(buffer_Overlay(tlv->value), offset + 2);
+            uint16_t inner_type = getWordFromOffset(bufferOverlay_Overlay(tlv->value), offset);
+            uint16_t inner_length = getWordFromOffset(bufferOverlay_Overlay(tlv->value), offset + 2);
 
             if (offset + inner_length >= length) {
-                // Failure. 
+                // Failure.
                 tlv->numberOfChildren = 0;
                 tlv->children = NULL;
                 return tlv;
@@ -91,10 +95,10 @@ tlv_Create(Packet *packet, uint16_t type, uint16_t length, uint32_t offset)
                 tlv->children = (TLV **) realloc(tlv->children, tlv->numberOfChildren * sizeof(TLV *));
 
                 TLV *child = tlv_Create(packet, inner_type, inner_length, offset + 4);
-                tlv->children[tlv->numberOfChildren] = child;
+                tlv->children[tlv->numberOfChildren - 1] = child;
             }
 
-            offset += inner_length;
+            offset += 4 + inner_length;
         }
     } else {
         tlv->children = NULL;
@@ -103,7 +107,6 @@ tlv_Create(Packet *packet, uint16_t type, uint16_t length, uint32_t offset)
 
     return tlv;
 }
-
 
 // TLV iterator functions
 TLV *
@@ -115,8 +118,9 @@ packet_GetNextTLV(Packet *packet, uint32_t offset, uint32_t limit)
     uint16_t length = getWordFromOffset(buffer_Overlay(packet->packet), offset);
     offset += 2;
 
-    TLV *tlv  = tlv_Create(packet, type, length, offset);
+    TLV *tlv  = tlv_Create(packet->packet, type, length, offset);
     tlv->sibling = NULL;
+
     return tlv;
 }
 
@@ -132,13 +136,13 @@ packet_CreateFromBuffer(Buffer *buffer)
     Packet *packet = (Packet *) malloc(sizeof(packet));
     packet->packet = buffer;
 
-    // TOOD: extract the fixed header stuff 
+    // TOOD: extract the fixed header stuff
 
     // Create the *tree* of TLVs
     uint32_t offset = 8; // skip past the fixed header
     packet->startTLV = packet_GetNextTLV(packet, offset, buffer_Size(buffer));
     TLV *prev = packet->startTLV;
-    
+
     while ((prev->offset + prev->length) < buffer_Size(buffer)) {
         TLV *next = packet_GetNextTLV(packet, prev->offset + prev->length, buffer_Size(buffer));
         prev->sibling = next;
@@ -238,9 +242,9 @@ _packet_FindTLVInBounds(Packet *packet, uint16_t type, uint32_t low, uint32_t hi
 
 // This function should take bounds for the search so we can re-use it for the nested TLV search
 TLV *
-packet_FindTLV(Packet *packet, uint16_t type)
+packet_FindTLV(TLV *root, uint16_t type)
 {
-
+    return NULL;
 }
 
 TLV *

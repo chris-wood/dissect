@@ -129,12 +129,6 @@ packet_GetNextTLV(Packet *packet, uint32_t offset, uint32_t limit)
     return tlv;
 }
 
-bool
-packet_HasInnerTLVs(Packet *packet, uint32_t offset, uint32_t length)
-{
-    return offset < length;
-}
-
 void
 packet_Display(Packet *packet, int indentation)
 {

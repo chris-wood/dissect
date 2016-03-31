@@ -33,6 +33,10 @@ buffer.h
 /Users/cwood/Projects/dissect/src/buffer.h
 
 /Users/cwood/Projects/dissect/src/test/test_packet.c
+stdio.h
+-
+fcntl.h
+-
 unistd.h
 -
 stdint.h
@@ -43,8 +47,14 @@ stdarg.h
 -
 cmocka.h
 -
+sys/stat.h
+-
+stdbool.h
+-
 ../packet.c
 /Users/cwood/Projects/dissect/src/packet.c
 
 /Users/cwood/Projects/dissect/src/util.h
+stdbool.h
+-
 

@@ -67,11 +67,13 @@ tlv_HasInnerTLV(TLV *tlv, uint32_t limit)
 }
 
 static TLV *
-tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset)
+tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint32_t limit)
 {
     TLV *tlv = (TLV *) malloc(sizeof(TLV));
     tlv->type = type;
     tlv->length = length;
+
+    //printf("root %d %d %d\n", type, length, limit);
 
     tlv->offset = offset;
     tlv->value = bufferOverlay_CreateFromBuffer(packet, offset, length);
@@ -82,10 +84,13 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset)
         tlv->numberOfChildren = 0;
 
         while (offset < length) {
-            uint16_t inner_type = getWordFromOffset(bufferOverlay_Overlay(tlv->value), offset);
-            uint16_t inner_length = getWordFromOffset(bufferOverlay_Overlay(tlv->value), offset + 2);
+            uint16_t inner_type = getWordFromOffset(buffer_Overlay(packet), offset);
+            uint16_t inner_length = getWordFromOffset(buffer_Overlay(packet), offset + 2);
 
-            if (offset + inner_length >= length) {
+            //printf("%d %d %d %d\n", inner_type, inner_length, offset, length);
+
+            if (offset + inner_length > limit) {
+                printf("failure\n");
                 // Failure.
                 tlv->numberOfChildren = 0;
                 tlv->children = NULL;
@@ -94,7 +99,7 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset)
                 tlv->numberOfChildren++;
                 tlv->children = (TLV **) realloc(tlv->children, tlv->numberOfChildren * sizeof(TLV *));
 
-                TLV *child = tlv_Create(packet, inner_type, inner_length, offset + 4);
+                TLV *child = tlv_Create(packet, inner_type, inner_length, offset + 4, limit);
                 tlv->children[tlv->numberOfChildren - 1] = child;
             }
 
@@ -118,7 +123,7 @@ packet_GetNextTLV(Packet *packet, uint32_t offset, uint32_t limit)
     uint16_t length = getWordFromOffset(buffer_Overlay(packet->packet), offset);
     offset += 2;
 
-    TLV *tlv  = tlv_Create(packet->packet, type, length, offset);
+    TLV *tlv  = tlv_Create(packet->packet, type, length, offset, limit);
     tlv->sibling = NULL;
 
     return tlv;
@@ -128,6 +133,16 @@ bool
 packet_HasInnerTLVs(Packet *packet, uint32_t offset, uint32_t length)
 {
     return offset < length;
+}
+
+void
+packet_Display(Packet *packet, int indentation)
+{
+    TLV *curr = packet->startTLV;
+    while (curr != NULL) {
+        tlv_Display(curr, indentation);
+        curr = curr->sibling;
+    }
 }
 
 Packet *

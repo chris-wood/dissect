@@ -16,10 +16,12 @@ struct buffer_overlay;
 typedef struct buffer_overlay BufferOverlay;
 
 BufferOverlay *bufferOverlay_CreateFromBuffer(Buffer *b, uint32_t offset, uint32_t length);
+Buffer *bufferOverlay_CreateBuffer(BufferOverlay *overlay);
 uint8_t *bufferOverlay_Overlay(BufferOverlay *overlay);
 uint32_t bufferOverlay_Length(BufferOverlay *overlay);
 
-void buffer_Display(FILE *fp, Buffer *b);
+void buffer_Display(Buffer *b, int indentation);
+void buffer_DisplayHex(Buffer *b, int indentation);
 Buffer *buffer_CreateEmpty();
 Buffer *buffer_CreateFromArray(uint8_t *bytes, size_t length);
 Buffer *buffer_Copy(Buffer *copy);

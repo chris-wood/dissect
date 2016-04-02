@@ -6,6 +6,97 @@
 
 #include "packet.h"
 #include "parser.h"
+#include "types.h"
+
+// Static type space tree
+static uint16_t header_types[4] = {
+    CCNxTypespace_OptionalHeaders_InterestLifetime,
+    CCNxTypespace_OptionalHeaders_RecommendedCacheTime,
+    CCNxTypespace_OptionalHeaders_InterestFragment,
+    CCNxTypespace_OptionalHeaders_ContentObjectFragment
+};
+
+static uint16_t top_level_types[6] = {
+    CCNxTypespace_MessageType_Interest,
+    CCNxTypespace_MessageType_ContentObject,
+    CCNxTypespace_MessageType_ValidationAlg,
+    CCNxTypespace_MessageType_ValidationPayload,
+    CCNxTypespace_MessageType_Manifest,
+    CCNxTypespace_MessageType_Control
+};
+
+static uint16_t message_types[8] = {
+    CCNxTypespace_CCNxMessage_Name,
+    CCNxTypespace_CCNxMessage_Payload,
+    CCNxTypespace_CCNxMessage_KeyIdRestriction,
+    CCNxTypespace_CCNxMessage_ContentObjectHashRestriction,
+    CCNxTypespace_CCNxMessage_PayloadType,
+    CCNxTypespace_CCNxMessage_ExpiryTime,
+    CCNxTypespace_CCNxMessage_HashGroup,
+    CCNxTypespace_CCNxMessage_EndChunkNumber
+};
+
+static uint16_t validation_alg_types[9] = {
+    CCNxTypespace_ValidationAlg_CRC32C,
+    CCNxTypespace_ValidationAlg_HMAC_SHA256,
+    CCNxTypespace_ValidationAlg_RSA_SHA256,
+    CCNxTypespace_ValidationAlg_EC_SECP_256K1,
+    CCNxTypespace_ValidationAlg_KeyId,
+    CCNxTypespace_ValidationAlg_PublicKey,
+    CCNxTypespace_ValidationAlg_Cert,
+    CCNxTypespace_ValidationAlg_KeyName,
+    CCNxTypespace_ValidationAlg_SigTime
+};
+
+///////
+// TODO: finish the rest of the typespace here
+///////
+
+// A generic node that we can use to stich together the typespace tree
+struct typespace_tree_node;
+typedef struct typespace_tree_node {
+    uint16_t *types;
+    uint16_t numTypes;
+
+    struct typespace_tree_node **children;
+    uint16_t numChildren;
+} TypespaceTreeNode;
+
+static TypespaceTreeNode header_root = {
+    .types = header_types,
+    .numTypes = sizeof(header_types),
+    .children = NULL,
+    .numChildren = 0
+};
+
+static TypespaceTreeNode validation_alg_types_node = {
+    .types = top_level_types,
+    .numTypes = sizeof(top_level_types),
+    .children = NULL,
+    .numChildren = 0
+};
+
+static TypespaceTreeNode message_types_node = { //&(TypespaceTreeNode) {
+    .types = message_types,
+    .numTypes = sizeof(message_types),
+    .children = NULL,
+    .numChildren = 0
+};
+
+static TypespaceTreeNode *top_level_type_children[2] = {
+    &message_types_node,
+    &validation_alg_types_node
+};
+
+static TypespaceTreeNode top_level_types_node = { // }&(TypespaceTreeNode) {
+    .types = top_level_types,
+    .numTypes = sizeof(top_level_types),
+    .children = top_level_type_children,
+    .numChildren = sizeof(top_level_type_children)
+};
+
+// get key id
+// CCNxTypespace_MessageType_Interest, CCNxTypespace_CCNxMessage_KeyIdRestriction
 
 struct packet {
     Buffer *packet;
@@ -73,8 +164,6 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint
     tlv->type = type;
     tlv->length = length;
 
-    //printf("root %d %d %d\n", type, length, limit);
-
     tlv->offset = offset;
     tlv->value = bufferOverlay_CreateFromBuffer(packet, offset, length);
 
@@ -87,10 +176,7 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint
             uint16_t inner_type = getWordFromOffset(buffer_Overlay(packet), offset);
             uint16_t inner_length = getWordFromOffset(buffer_Overlay(packet), offset + 2);
 
-            //printf("%d %d %d %d\n", inner_type, inner_length, offset, length);
-
             if (offset + inner_length > limit) {
-                printf("failure\n");
                 // Failure.
                 tlv->numberOfChildren = 0;
                 tlv->children = NULL;
@@ -132,6 +218,7 @@ packet_GetNextTLV(Packet *packet, uint32_t offset, uint32_t limit)
 void
 packet_Display(Packet *packet, int indentation)
 {
+    
     TLV *curr = packet->startTLV;
     while (curr != NULL) {
         tlv_Display(curr, indentation);
@@ -200,66 +287,82 @@ packet_GetHeaderLength(Packet *packet)
     return getHeaderLength(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
 }
 
+static Buffer *
+_packet_GetFieldValueFromTypeTree(Packet *packet, uint32_t numberOfTypes, uint16_t type[numberOfTypes])
+{
+    TLV *tlv = packet_FindNestedTLV(packet, numberOfTypes, type);
+    if (tlv != NULL) {
+        return bufferOverlay_CreateBuffer(tlv->value);
+    } else {
+        return NULL;
+    }
+}
+
 // Absolute packet fields
 Buffer *
 packet_GetFieldValue(Packet *packet, PacketField field)
 {
     switch (field) {
-        PacketField_Name:
-            return _readName(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
-        PacketField_ContentObjectHashRestriction:
-            return _readContentObjectHash(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
-        PacketField_KeyIdRestriction:
-            break;
-        PacketField_Payload:
-            break;
-        PacketField_ValidationAlgCert:
-            break;
-        PacketField_ValidationAlgKeyId:
-            break;
-        PacketField_ValidationAlgPublicKey:
-            break;
-        PacketField_ValidationAlgSigTime:
-            break;
-        PacketField_ValidationPayload:
-            break;
-    }
-    return NULL;
-}
-
-bool
-packet_HasNextTLV(Packet *packet, uint32_t offset)
-{
-    return (offset < buffer_Size(packet->packet));
-}
-
-static TLV *
-_packet_FindTLVInBounds(Packet *packet, uint16_t type, uint32_t low, uint32_t high)
-{
-    TLV *curr = packet->startTLV;
-    uint32_t offset = 0;
-
-    while (curr != NULL) {
-        if (curr->type == type) {
-            return curr;
+        case PacketField_Name: {
+            uint16_t typeTree[2] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_CCNxMessage_Name};
+            return _packet_GetFieldValueFromTypeTree(packet, 2, typeTree);
         }
-        //curr = curr->nextTLV;
+        case PacketField_ContentObjectHashRestriction:
+            break;
+        case PacketField_KeyIdRestriction:
+            break;
+        case PacketField_Payload:
+            break;
+        case PacketField_ValidationAlgCert:
+            break;
+        case PacketField_ValidationAlgKeyId:
+            break;
+        case PacketField_ValidationAlgPublicKey:
+            break;
+        case PacketField_ValidationAlgSigTime:
+            break;
+        case PacketField_ValidationAlgKeyName:
+            break;
+        case PacketField_ValidationPayload:
+            break;
+        case PacketField_Invalid:
+        default:
+            break;
     }
-
     return NULL;
 }
 
 // This function should take bounds for the search so we can re-use it for the nested TLV search
-TLV *
-packet_FindTLV(TLV *root, uint16_t type)
+static TLV *
+_packet_FindTLV(TLV *tlv, uint32_t numberOfTypes, uint16_t type[numberOfTypes], size_t typeOffset)
 {
+    uint16_t target = type[typeOffset];
+
+    while (tlv != NULL) {
+        if (tlv->type == target) {
+            if (numberOfTypes == 1) {
+                return tlv;
+            } else { // go into the type space
+                for (int i = 0; i < tlv->numberOfChildren; i++) {
+                    TLV *child = tlv->children[i];
+                    TLV *result = _packet_FindTLV(child, numberOfTypes - 1, type, typeOffset + 1);
+                    if (result != NULL) {
+                        return result;
+                    }
+                }
+            }
+        }
+        tlv = tlv->sibling;
+    }
+
     return NULL;
 }
 
 TLV *
 packet_FindNestedTLV(Packet *packet, uint32_t numberOfTypes, uint16_t type[numberOfTypes])
 {
-    return NULL;
+    TLV *tlv = packet->startTLV;
+    return _packet_FindTLV(tlv, numberOfTypes, type, 0);
 }
 
 uint16_t

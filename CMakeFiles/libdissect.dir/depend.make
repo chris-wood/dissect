@@ -8,6 +8,7 @@ CMakeFiles/libdissect.dir/src/packet.c.o: src/buffer.h
 CMakeFiles/libdissect.dir/src/packet.c.o: src/packet.c
 CMakeFiles/libdissect.dir/src/packet.c.o: src/packet.h
 CMakeFiles/libdissect.dir/src/packet.c.o: src/parser.h
+CMakeFiles/libdissect.dir/src/packet.c.o: src/types.h
 CMakeFiles/libdissect.dir/src/packet.c.o: src/util.h
 
 CMakeFiles/libdissect.dir/src/parser.c.o: src/buffer.h

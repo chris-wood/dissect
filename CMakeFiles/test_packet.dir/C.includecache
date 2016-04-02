@@ -21,6 +21,8 @@ packet.h
 /Users/cwood/Projects/dissect/src/packet.h
 parser.h
 /Users/cwood/Projects/dissect/src/parser.h
+types.h
+/Users/cwood/Projects/dissect/src/types.h
 
 /Users/cwood/Projects/dissect/src/packet.h
 buffer.h
@@ -53,6 +55,8 @@ stdbool.h
 -
 ../packet.c
 /Users/cwood/Projects/dissect/src/packet.c
+
+/Users/cwood/Projects/dissect/src/types.h
 
 /Users/cwood/Projects/dissect/src/util.h
 stdbool.h

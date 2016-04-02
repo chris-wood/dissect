@@ -26,6 +26,13 @@ bufferOverlay_CreateFromBuffer(Buffer *b, uint32_t offset, uint32_t length)
     return overlay;
 }
 
+Buffer *
+bufferOverlay_CreateBuffer(BufferOverlay *overlay)
+{
+    Buffer *buffer = buffer_CreateFromArray(overlay->bytes, overlay->length);
+    return buffer;
+}
+
 uint8_t *
 bufferOverlay_Overlay(BufferOverlay *overlay)
 {
@@ -39,12 +46,27 @@ bufferOverlay_Length(BufferOverlay *overlay)
 }
 
 void
-buffer_Display(FILE *fp, Buffer *b)
+buffer_Display(Buffer *b, int indentation)
 {
-    for (int i = 0; i < b->length; i++) {
-        fprintf(fp, "%x", b->bytes[i]);
+    for (int i = 0; i < indentation; i++) {
+        printf("  ");
     }
-    fprintf(fp, "\n");
+    for (int i = 0; i < b->length; i++) {
+        printf("%c", b->bytes[i]);
+    }
+    printf("\n");
+}
+
+void
+buffer_DisplayHex(Buffer *b, int indentation)
+{
+    for (int i = 0; i < indentation; i++) {
+        printf("  ");
+    }
+    for (int i = 0; i < b->length; i++) {
+        printf("%c", b->bytes[i]);
+    }
+    printf("\n");
 }
 
 Buffer *

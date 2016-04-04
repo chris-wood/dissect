@@ -6,7 +6,6 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_C
   "/Users/cwood/Projects/dissect/src/buffer.c" "/Users/cwood/Projects/dissect/CMakeFiles/libdissect.dir/src/buffer.c.o"
   "/Users/cwood/Projects/dissect/src/packet.c" "/Users/cwood/Projects/dissect/CMakeFiles/libdissect.dir/src/packet.c.o"
-  "/Users/cwood/Projects/dissect/src/parser.c" "/Users/cwood/Projects/dissect/CMakeFiles/libdissect.dir/src/parser.c.o"
   )
 set(CMAKE_C_COMPILER_ID "AppleClang")
 

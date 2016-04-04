@@ -42,18 +42,6 @@ buffer.h
 util.h
 /Users/cwood/Projects/dissect/src/util.h
 
-/Users/cwood/Projects/dissect/src/parser.c
-stdio.h
--
-unistd.h
--
-stdlib.h
--
-string.h
--
-parser.h
-/Users/cwood/Projects/dissect/src/parser.h
-
 /Users/cwood/Projects/dissect/src/parser.h
 buffer.h
 /Users/cwood/Projects/dissect/src/buffer.h

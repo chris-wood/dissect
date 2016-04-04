@@ -95,9 +95,6 @@ static TypespaceTreeNode top_level_types_node = { // }&(TypespaceTreeNode) {
     .numChildren = sizeof(top_level_type_children)
 };
 
-// get key id
-// CCNxTypespace_MessageType_Interest, CCNxTypespace_CCNxMessage_KeyIdRestriction
-
 struct packet {
     Buffer *packet;
     TLV *startTLV;
@@ -145,8 +142,8 @@ tlv_HasInnerTLV(TLV *tlv, uint32_t limit)
     }
 
     // Peek and read the type and length
-    uint16_t type = getWordFromOffset(bufferOverlay_Overlay(tlv->value), 0);
-    uint16_t length = getWordFromOffset(bufferOverlay_Overlay(tlv->value), 2);
+    uint16_t type = bufferOverlay_GetWordAtOffset(tlv->value, 0);
+    uint16_t length = bufferOverlay_GetWordAtOffset(tlv->value, 2);
 
     // If the length of the inner TLV is less than the limit, then there *could*
     // be another TLV inside.
@@ -173,8 +170,8 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint
         tlv->numberOfChildren = 0;
 
         while (offset < length) {
-            uint16_t inner_type = getWordFromOffset(buffer_Overlay(packet), offset);
-            uint16_t inner_length = getWordFromOffset(buffer_Overlay(packet), offset + 2);
+            uint16_t inner_type = buffer_GetWordAtOffset(packet, offset);
+            uint16_t inner_length = buffer_GetWordAtOffset(packet, offset + 2);
 
             if (offset + inner_length > limit) {
                 // Failure.
@@ -203,10 +200,10 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint
 TLV *
 packet_GetNextTLV(Packet *packet, uint32_t offset, uint32_t limit)
 {
-    uint16_t type = getWordFromOffset(buffer_Overlay(packet->packet), offset);
+    uint16_t type = buffer_GetWordAtOffset(packet->packet, offset);
     offset += 2;
 
-    uint16_t length = getWordFromOffset(buffer_Overlay(packet->packet), offset);
+    uint16_t length = buffer_GetWordAtOffset(packet->packet, offset);
     offset += 2;
 
     TLV *tlv  = tlv_Create(packet->packet, type, length, offset, limit);
@@ -218,7 +215,7 @@ packet_GetNextTLV(Packet *packet, uint32_t offset, uint32_t limit)
 void
 packet_Display(Packet *packet, int indentation)
 {
-    
+
     TLV *curr = packet->startTLV;
     while (curr != NULL) {
         tlv_Display(curr, indentation);
@@ -252,7 +249,7 @@ packet_CreateFromBuffer(Buffer *buffer)
 PacketVersion
 packet_GetVersion(Packet *packet)
 {
-    switch (getPacketVersion(buffer_Overlay(packet->packet), buffer_Size(packet->packet))) {
+    switch (buffer_GetWordAtOffset(packet->packet, 0)) {
         case PacketVersion_V0:
             return PacketVersion_V0;
         case PacketVersion_V1:
@@ -264,7 +261,7 @@ packet_GetVersion(Packet *packet)
 PacketType
 packet_GetType(Packet *packet)
 {
-    switch (getPacketType(buffer_Overlay(packet->packet), buffer_Size(packet->packet))) {
+    switch (buffer_GetWordAtOffset(packet->packet, 1)) {
         case PacketType_Request:
             return PacketType_Request;
         case PacketType_Response:
@@ -278,13 +275,13 @@ packet_GetType(Packet *packet)
 uint16_t
 packet_GetLength(Packet *packet)
 {
-    return getPacketLength(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
+    return buffer_GetWordAtOffset(packet->packet, 2);
 }
 
 uint16_t
 packet_GetHeaderLength(Packet *packet)
 {
-    return getHeaderLength(buffer_Overlay(packet->packet), buffer_Size(packet->packet));
+    return buffer_GetWordAtOffset(packet->packet, 7);
 }
 
 static Buffer *
@@ -299,6 +296,7 @@ _packet_GetFieldValueFromTypeTree(Packet *packet, uint32_t numberOfTypes, uint16
 }
 
 // Absolute packet fields
+// TODO: make these type trees static
 Buffer *
 packet_GetFieldValue(Packet *packet, PacketField field)
 {
@@ -307,24 +305,42 @@ packet_GetFieldValue(Packet *packet, PacketField field)
             uint16_t typeTree[2] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_CCNxMessage_Name};
             return _packet_GetFieldValueFromTypeTree(packet, 2, typeTree);
         }
-        case PacketField_ContentObjectHashRestriction:
-            break;
-        case PacketField_KeyIdRestriction:
-            break;
-        case PacketField_Payload:
-            break;
-        case PacketField_ValidationAlgCert:
-            break;
-        case PacketField_ValidationAlgKeyId:
-            break;
-        case PacketField_ValidationAlgPublicKey:
-            break;
-        case PacketField_ValidationAlgSigTime:
-            break;
-        case PacketField_ValidationAlgKeyName:
-            break;
-        case PacketField_ValidationPayload:
-            break;
+        case PacketField_ContentObjectHashRestriction: {
+            uint16_t typeTree[2] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_CCNxMessage_ContentObjectHashRestriction};
+            return _packet_GetFieldValueFromTypeTree(packet, 2, typeTree);
+        }
+        case PacketField_KeyIdRestriction: {
+            uint16_t typeTree[2] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_CCNxMessage_KeyIdRestriction};
+            return _packet_GetFieldValueFromTypeTree(packet, 2, typeTree);
+        }
+        case PacketField_Payload: {
+            uint16_t typeTree[2] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_CCNxMessage_Payload};
+            return _packet_GetFieldValueFromTypeTree(packet, 2, typeTree);
+        }
+        case PacketField_ValidationAlgCert: {
+            uint16_t typeTree[3] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_MessageType_ValidationAlg, CCNxTypespace_ValidationAlg_Cert};
+            return _packet_GetFieldValueFromTypeTree(packet, 3, typeTree);
+        }
+        case PacketField_ValidationAlgKeyId: {
+            uint16_t typeTree[3] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_MessageType_ValidationAlg, CCNxTypespace_ValidationAlg_KeyId};
+            return _packet_GetFieldValueFromTypeTree(packet, 3, typeTree);
+        }
+        case PacketField_ValidationAlgPublicKey: {
+            uint16_t typeTree[3] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_MessageType_ValidationAlg, CCNxTypespace_ValidationAlg_PublicKey};
+            return _packet_GetFieldValueFromTypeTree(packet, 3, typeTree);
+        }
+        case PacketField_ValidationAlgSigTime: {
+            uint16_t typeTree[3] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_MessageType_ValidationAlg, CCNxTypespace_ValidationAlg_SigTime};
+            return _packet_GetFieldValueFromTypeTree(packet, 3, typeTree);
+        }
+        case PacketField_ValidationAlgKeyName: {
+            uint16_t typeTree[3] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_MessageType_ValidationAlg, CCNxTypespace_ValidationAlg_KeyName};
+            return _packet_GetFieldValueFromTypeTree(packet, 3, typeTree);
+        }
+        case PacketField_ValidationPayload: {
+            uint16_t typeTree[2] = {CCNxTypespace_MessageType_Interest, CCNxTypespace_MessageType_ValidationPayload};
+            return _packet_GetFieldValueFromTypeTree(packet, 2, typeTree);
+        }
         case PacketField_Invalid:
         default:
             break;

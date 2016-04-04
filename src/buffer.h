@@ -20,6 +20,9 @@ Buffer *bufferOverlay_CreateBuffer(BufferOverlay *overlay);
 uint8_t *bufferOverlay_Overlay(BufferOverlay *overlay);
 uint32_t bufferOverlay_Length(BufferOverlay *overlay);
 
+uint16_t buffer_GetWordAtOffset(Buffer *b, uint32_t offset);
+uint16_t bufferOverlay_GetWordAtOffset(BufferOverlay *b, uint32_t offset);
+
 void buffer_Display(Buffer *b, int indentation);
 void buffer_DisplayHex(Buffer *b, int indentation);
 Buffer *buffer_CreateEmpty();

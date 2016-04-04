@@ -45,6 +45,13 @@ bufferOverlay_Length(BufferOverlay *overlay)
     return overlay->length;
 }
 
+uint16_t
+bufferOverlay_GetWordAtOffset(BufferOverlay *b, uint32_t offset)
+{
+    uint16_t word = ((uint16_t)(b->bytes[offset]) << 8) | (uint16_t)(b->bytes[offset + 1]);
+    return word;
+}
+
 void
 buffer_Display(Buffer *b, int indentation)
 {
@@ -96,6 +103,13 @@ buffer_Copy(Buffer *copy)
     buffer->bytes = (uint8_t *) malloc(copy->length);
     memcpy(buffer->bytes, copy->bytes, copy->length);
     return buffer;
+}
+
+uint16_t
+buffer_GetWordAtOffset(Buffer *b, uint32_t offset)
+{
+    uint16_t word = ((uint16_t)(b->bytes[offset]) << 8) | (uint16_t)(b->bytes[offset + 1]);
+    return word;
 }
 
 int

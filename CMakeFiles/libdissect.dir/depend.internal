@@ -11,7 +11,3 @@ CMakeFiles/libdissect.dir/src/packet.c.o
  /Users/cwood/Projects/dissect/src/parser.h
  /Users/cwood/Projects/dissect/src/types.h
  /Users/cwood/Projects/dissect/src/util.h
-CMakeFiles/libdissect.dir/src/parser.c.o
- /Users/cwood/Projects/dissect/src/buffer.h
- /Users/cwood/Projects/dissect/src/parser.c
- /Users/cwood/Projects/dissect/src/parser.h

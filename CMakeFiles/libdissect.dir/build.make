@@ -105,45 +105,19 @@ CMakeFiles/libdissect.dir/src/buffer.c.o.provides: CMakeFiles/libdissect.dir/src
 CMakeFiles/libdissect.dir/src/buffer.c.o.provides.build: CMakeFiles/libdissect.dir/src/buffer.c.o
 
 
-CMakeFiles/libdissect.dir/src/parser.c.o: CMakeFiles/libdissect.dir/flags.make
-CMakeFiles/libdissect.dir/src/parser.c.o: src/parser.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cwood/Projects/dissect/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/libdissect.dir/src/parser.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libdissect.dir/src/parser.c.o   -c /Users/cwood/Projects/dissect/src/parser.c
-
-CMakeFiles/libdissect.dir/src/parser.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/libdissect.dir/src/parser.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/cwood/Projects/dissect/src/parser.c > CMakeFiles/libdissect.dir/src/parser.c.i
-
-CMakeFiles/libdissect.dir/src/parser.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/libdissect.dir/src/parser.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/cwood/Projects/dissect/src/parser.c -o CMakeFiles/libdissect.dir/src/parser.c.s
-
-CMakeFiles/libdissect.dir/src/parser.c.o.requires:
-
-.PHONY : CMakeFiles/libdissect.dir/src/parser.c.o.requires
-
-CMakeFiles/libdissect.dir/src/parser.c.o.provides: CMakeFiles/libdissect.dir/src/parser.c.o.requires
-	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/parser.c.o.provides.build
-.PHONY : CMakeFiles/libdissect.dir/src/parser.c.o.provides
-
-CMakeFiles/libdissect.dir/src/parser.c.o.provides.build: CMakeFiles/libdissect.dir/src/parser.c.o
-
-
 # Object files for target libdissect
 libdissect_OBJECTS = \
 "CMakeFiles/libdissect.dir/src/packet.c.o" \
-"CMakeFiles/libdissect.dir/src/buffer.c.o" \
-"CMakeFiles/libdissect.dir/src/parser.c.o"
+"CMakeFiles/libdissect.dir/src/buffer.c.o"
 
 # External object files for target libdissect
 libdissect_EXTERNAL_OBJECTS =
 
 lib/liblibdissect.a: CMakeFiles/libdissect.dir/src/packet.c.o
 lib/liblibdissect.a: CMakeFiles/libdissect.dir/src/buffer.c.o
-lib/liblibdissect.a: CMakeFiles/libdissect.dir/src/parser.c.o
 lib/liblibdissect.a: CMakeFiles/libdissect.dir/build.make
 lib/liblibdissect.a: CMakeFiles/libdissect.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/cwood/Projects/dissect/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C static library lib/liblibdissect.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/cwood/Projects/dissect/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C static library lib/liblibdissect.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/libdissect.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/libdissect.dir/link.txt --verbose=$(VERBOSE)
 
@@ -154,7 +128,6 @@ CMakeFiles/libdissect.dir/build: lib/liblibdissect.a
 
 CMakeFiles/libdissect.dir/requires: CMakeFiles/libdissect.dir/src/packet.c.o.requires
 CMakeFiles/libdissect.dir/requires: CMakeFiles/libdissect.dir/src/buffer.c.o.requires
-CMakeFiles/libdissect.dir/requires: CMakeFiles/libdissect.dir/src/parser.c.o.requires
 
 .PHONY : CMakeFiles/libdissect.dir/requires
 

@@ -230,33 +230,6 @@ src/packet.c.s:
 	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/packet.c.s
 .PHONY : src/packet.c.s
 
-src/parser.o: src/parser.c.o
-
-.PHONY : src/parser.o
-
-# target to build an object file
-src/parser.c.o:
-	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/parser.c.o
-.PHONY : src/parser.c.o
-
-src/parser.i: src/parser.c.i
-
-.PHONY : src/parser.i
-
-# target to preprocess a source file
-src/parser.c.i:
-	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/parser.c.i
-.PHONY : src/parser.c.i
-
-src/parser.s: src/parser.c.s
-
-.PHONY : src/parser.s
-
-# target to generate assembly for a file
-src/parser.c.s:
-	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/parser.c.s
-.PHONY : src/parser.c.s
-
 src/test/test_packet.o: src/test/test_packet.c.o
 
 .PHONY : src/test/test_packet.o
@@ -304,9 +277,6 @@ help:
 	@echo "... src/packet.o"
 	@echo "... src/packet.i"
 	@echo "... src/packet.s"
-	@echo "... src/parser.o"
-	@echo "... src/parser.i"
-	@echo "... src/parser.s"
 	@echo "... src/test/test_packet.o"
 	@echo "... src/test/test_packet.i"
 	@echo "... src/test/test_packet.s"

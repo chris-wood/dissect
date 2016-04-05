@@ -19,9 +19,9 @@ typedef enum {
 } PacketVersion;
 
 typedef enum {
-    PacketType_Request,
-    PacketType_Response,
-    PacketType_RequestReturn,
+    PacketType_Request = 0x00,
+    PacketType_Response = 0x01,
+    PacketType_RequestReturn = 0x02,
     PacketType_Invalid
 } PacketType;
 

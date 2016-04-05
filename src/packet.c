@@ -211,13 +211,43 @@ packet_Display(Packet *packet, int indentation)
     _packet_DisplayBody(packet->startTLV, indentation);
 }
 
+static void
+_packet_ExtractHeader(Packet *packet)
+{
+    Buffer *buffer = packet->packet;
+    packet->header.version = buffer_GetUint8(buffer, 0);
+    packet->header.packetType = buffer_GetUint8(buffer, 1);
+    packet->header.packetLength = buffer_GetUint16(buffer, 2);
+    packet->header.headerLength = buffer_GetUint8(buffer, 7);
+
+    switch (packet->header.packetType) {
+        case PacketType_Request:
+            packet->interestHeader.hopLimit = buffer_GetUint8(buffer, 4);
+            packet->interestHeader.reserved = buffer_GetUint8(buffer, 5);
+            packet->interestHeader.flags = buffer_GetUint8(buffer, 6);
+            break;
+        case PacketType_Response:
+            packet->contentObjectHeader.reserved = buffer_GetUint16(buffer, 4);
+            packet->interestHeader.flags = buffer_GetUint8(buffer, 6);
+            break;
+        case PacketType_RequestReturn:
+            packet->interestReturnHeader.hopLimit = buffer_GetUint8(buffer, 4);
+            packet->interestReturnHeader.returnCode = buffer_GetUint8(buffer, 5);
+            packet->interestReturnHeader.flags = buffer_GetUint8(buffer, 6);
+            break;
+        default:
+            break;
+    }
+}
+
 Packet *
 packet_CreateFromBuffer(Buffer *buffer)
 {
     Packet *packet = (Packet *) malloc(sizeof(packet));
     packet->packet = buffer;
 
-    // TOOD: extract the fixed header stuff
+    // Populate fixed header information
+    _packet_ExtractHeader(packet);
 
     // Create the *tree* of TLVs
     uint32_t offset = 8; // skip past the fixed header
@@ -237,7 +267,7 @@ packet_CreateFromBuffer(Buffer *buffer)
 PacketVersion
 packet_GetVersion(Packet *packet)
 {
-    switch (buffer_GetWordAtOffset(packet->packet, 0)) {
+    switch (packet->header.version) {
         case PacketVersion_V0:
             return PacketVersion_V0;
         case PacketVersion_V1:
@@ -249,7 +279,7 @@ packet_GetVersion(Packet *packet)
 PacketType
 packet_GetType(Packet *packet)
 {
-    switch (buffer_GetWordAtOffset(packet->packet, 1)) {
+    switch (packet->header.packetType) {
         case PacketType_Request:
             return PacketType_Request;
         case PacketType_Response:
@@ -263,13 +293,13 @@ packet_GetType(Packet *packet)
 uint16_t
 packet_GetLength(Packet *packet)
 {
-    return buffer_GetWordAtOffset(packet->packet, 2);
+    return packet->header.packetLength;
 }
 
 uint16_t
 packet_GetHeaderLength(Packet *packet)
 {
-    return buffer_GetWordAtOffset(packet->packet, 7);
+    return packet->header.headerLength;
 }
 
 static Buffer *

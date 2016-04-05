@@ -42,5 +42,10 @@ uint32_t buffer_GetUint32(Buffer *buffer, size_t offset);
 uint16_t buffer_GetUint16(Buffer *buffer, size_t offset);
 uint8_t buffer_GetUint8(Buffer *buffer, size_t offset);
 
+void buffer_PutUint8(Buffer *buffer, size_t offset, uint8_t value);
+void buffer_PutUint16(Buffer *buffer, size_t offset, uint16_t value);
+void buffer_PutUint32(Buffer *buffer, size_t offset, uint32_t value);
+void buffer_PutUint64(Buffer *buffer, size_t offset, uint64_t value);
+
 
 #endif // DISSECT_BUFFER_H

@@ -3,7 +3,15 @@ project(dissect)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c99")
 
-set(SOURCE_FILES src/packet.c src/packet.h src/buffer.c src/buffer.h src/util.h)
+set(SOURCE_FILES
+    src/packet.c
+    src/packet.h
+    src/buffer.c
+    src/buffer.h
+    src/tlv.c
+    src/tlv.h
+    src/util.h
+    )
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)

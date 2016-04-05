@@ -257,6 +257,33 @@ src/test/test_packet.c.s:
 	$(MAKE) -f CMakeFiles/test_packet.dir/build.make CMakeFiles/test_packet.dir/src/test/test_packet.c.s
 .PHONY : src/test/test_packet.c.s
 
+src/tlv.o: src/tlv.c.o
+
+.PHONY : src/tlv.o
+
+# target to build an object file
+src/tlv.c.o:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/tlv.c.o
+.PHONY : src/tlv.c.o
+
+src/tlv.i: src/tlv.c.i
+
+.PHONY : src/tlv.i
+
+# target to preprocess a source file
+src/tlv.c.i:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/tlv.c.i
+.PHONY : src/tlv.c.i
+
+src/tlv.s: src/tlv.c.s
+
+.PHONY : src/tlv.s
+
+# target to generate assembly for a file
+src/tlv.c.s:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/tlv.c.s
+.PHONY : src/tlv.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -280,6 +307,9 @@ help:
 	@echo "... src/test/test_packet.o"
 	@echo "... src/test/test_packet.i"
 	@echo "... src/test/test_packet.s"
+	@echo "... src/tlv.o"
+	@echo "... src/tlv.i"
+	@echo "... src/tlv.s"
 .PHONY : help
 
 

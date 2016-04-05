@@ -7,7 +7,12 @@ CMakeFiles/libdissect.dir/src/buffer.c.o: src/buffer.h
 CMakeFiles/libdissect.dir/src/packet.c.o: src/buffer.h
 CMakeFiles/libdissect.dir/src/packet.c.o: src/packet.c
 CMakeFiles/libdissect.dir/src/packet.c.o: src/packet.h
-CMakeFiles/libdissect.dir/src/packet.c.o: src/parser.h
+CMakeFiles/libdissect.dir/src/packet.c.o: src/tlv.h
 CMakeFiles/libdissect.dir/src/packet.c.o: src/types.h
 CMakeFiles/libdissect.dir/src/packet.c.o: src/util.h
+
+CMakeFiles/libdissect.dir/src/tlv.c.o: src/buffer.h
+CMakeFiles/libdissect.dir/src/tlv.c.o: src/tlv.c
+CMakeFiles/libdissect.dir/src/tlv.c.o: src/tlv.h
+CMakeFiles/libdissect.dir/src/tlv.c.o: src/util.h
 

@@ -7,12 +7,10 @@
 
 #include "buffer.h"
 #include "util.h"
+#include "tlv.h"
 
 struct packet;
 typedef struct packet Packet;
-
-struct TLV;
-typedef struct tlv TLV;
 
 typedef enum {
     PacketVersion_V0,
@@ -70,9 +68,5 @@ bool packet_HasNextTLV(Packet *packet, uint32_t offset);
 TLV *packet_FindNestedTLV(Packet *packet, uint32_t numberOfTypes, uint16_t type[numberOfTypes]);
 
 // Packet query functions
-
-uint16_t tlv_Type(TLV *tlv);
-uint16_t tlv_Length(TLV *tlv);
-uint8_t *tlv_Value(TLV *tlv);
 
 #endif //DISSECT_PACKET_H

@@ -52,6 +52,28 @@ bufferOverlay_GetWordAtOffset(BufferOverlay *b, uint32_t offset)
     return word;
 }
 
+uint64_t bufferOverlay_GetUint64(BufferOverlay *buffer, size_t offset)
+{
+
+}
+
+uint32_t bufferOverlay_GetUint32(BufferOverlay *buffer, size_t offset)
+{
+
+}
+
+uint16_t bufferOverlay_GetUint16(BufferOverlay *buffer, size_t offset)
+{
+    // TODO: assert that offset + 1 is in bounds
+    uint16_t value = ((uint16_t)(buffer->bytes[offset]) << 8) | (uint16_t)(buffer->bytes[offset + 1]);
+    return value;
+}
+
+uint8_t bufferOverlay_GetUint8(BufferOverlay *buffer, size_t offset)
+{
+    return buffer->bytes[offset];
+}
+
 void
 buffer_Display(Buffer *b, int indentation)
 {

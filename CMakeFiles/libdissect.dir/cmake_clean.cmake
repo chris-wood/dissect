@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/libdissect.dir/src/packet.c.o"
   "CMakeFiles/libdissect.dir/src/buffer.c.o"
+  "CMakeFiles/libdissect.dir/src/tlv.c.o"
   "lib/liblibdissect.pdb"
   "lib/liblibdissect.a"
 )

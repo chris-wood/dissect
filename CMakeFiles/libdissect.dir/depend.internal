@@ -8,6 +8,11 @@ CMakeFiles/libdissect.dir/src/packet.c.o
  /Users/cwood/Projects/dissect/src/buffer.h
  /Users/cwood/Projects/dissect/src/packet.c
  /Users/cwood/Projects/dissect/src/packet.h
- /Users/cwood/Projects/dissect/src/parser.h
+ /Users/cwood/Projects/dissect/src/tlv.h
  /Users/cwood/Projects/dissect/src/types.h
+ /Users/cwood/Projects/dissect/src/util.h
+CMakeFiles/libdissect.dir/src/tlv.c.o
+ /Users/cwood/Projects/dissect/src/buffer.h
+ /Users/cwood/Projects/dissect/src/tlv.c
+ /Users/cwood/Projects/dissect/src/tlv.h
  /Users/cwood/Projects/dissect/src/util.h

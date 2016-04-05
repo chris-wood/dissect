@@ -199,11 +199,6 @@ _packet_DisplayBody(TLV *root, int indentation)
     if (sibling != NULL) {
         _packet_DisplayBody(sibling, indentation);
     }
-
-    // while (curr != NULL) {
-    //     tlv_Display(curr, indentation);
-    //     curr = tlv_GetSibling(curr);
-    // }
 }
 
 // 5 columns for hex offset

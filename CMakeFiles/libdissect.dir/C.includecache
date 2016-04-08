@@ -26,6 +26,14 @@ stdint.h
 string.h
 -
 
+/Users/cwood/Projects/dissect/src/capture.c
+pcap/pcap.h
+-
+capture.h
+/Users/cwood/Projects/dissect/src/capture.h
+
+/Users/cwood/Projects/dissect/src/capture.h
+
 /Users/cwood/Projects/dissect/src/packet.c
 stdlib.h
 -

@@ -4,6 +4,9 @@
 CMakeFiles/libdissect.dir/src/buffer.c.o: src/buffer.c
 CMakeFiles/libdissect.dir/src/buffer.c.o: src/buffer.h
 
+CMakeFiles/libdissect.dir/src/capture.c.o: src/capture.c
+CMakeFiles/libdissect.dir/src/capture.c.o: src/capture.h
+
 CMakeFiles/libdissect.dir/src/packet.c.o: src/buffer.h
 CMakeFiles/libdissect.dir/src/packet.c.o: src/packet.c
 CMakeFiles/libdissect.dir/src/packet.c.o: src/packet.h

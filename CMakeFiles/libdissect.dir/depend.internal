@@ -4,6 +4,9 @@
 CMakeFiles/libdissect.dir/src/buffer.c.o
  /Users/cwood/Projects/dissect/src/buffer.c
  /Users/cwood/Projects/dissect/src/buffer.h
+CMakeFiles/libdissect.dir/src/capture.c.o
+ /Users/cwood/Projects/dissect/src/capture.c
+ /Users/cwood/Projects/dissect/src/capture.h
 CMakeFiles/libdissect.dir/src/packet.c.o
  /Users/cwood/Projects/dissect/src/buffer.h
  /Users/cwood/Projects/dissect/src/packet.c

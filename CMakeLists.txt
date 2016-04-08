@@ -10,6 +10,8 @@ set(SOURCE_FILES
     src/buffer.h
     src/tlv.c
     src/tlv.h
+    src/capture.c
+    src/capture.h
     src/util.h
     )
 

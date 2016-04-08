@@ -176,6 +176,33 @@ src/buffer.c.s:
 	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/buffer.c.s
 .PHONY : src/buffer.c.s
 
+src/capture.o: src/capture.c.o
+
+.PHONY : src/capture.o
+
+# target to build an object file
+src/capture.c.o:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/capture.c.o
+.PHONY : src/capture.c.o
+
+src/capture.i: src/capture.c.i
+
+.PHONY : src/capture.i
+
+# target to preprocess a source file
+src/capture.c.i:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/capture.c.i
+.PHONY : src/capture.c.i
+
+src/capture.s: src/capture.c.s
+
+.PHONY : src/capture.s
+
+# target to generate assembly for a file
+src/capture.c.s:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/capture.c.s
+.PHONY : src/capture.c.s
+
 src/dissect.o: src/dissect.c.o
 
 .PHONY : src/dissect.o
@@ -298,6 +325,9 @@ help:
 	@echo "... src/buffer.o"
 	@echo "... src/buffer.i"
 	@echo "... src/buffer.s"
+	@echo "... src/capture.o"
+	@echo "... src/capture.i"
+	@echo "... src/capture.s"
 	@echo "... src/dissect.o"
 	@echo "... src/dissect.i"
 	@echo "... src/dissect.s"

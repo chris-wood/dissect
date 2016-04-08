@@ -14,6 +14,8 @@ stdint.h
 string.h
 -
 
+/Users/cwood/Projects/dissect/src/capture.h
+
 /Users/cwood/Projects/dissect/src/dissect.c
 stdio.h
 -
@@ -23,6 +25,8 @@ getopt.h
 -
 packet.h
 /Users/cwood/Projects/dissect/src/packet.h
+capture.h
+/Users/cwood/Projects/dissect/src/capture.h
 
 /Users/cwood/Projects/dissect/src/packet.h
 buffer.h

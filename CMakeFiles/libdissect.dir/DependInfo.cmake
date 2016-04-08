@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
   "/Users/cwood/Projects/dissect/src/buffer.c" "/Users/cwood/Projects/dissect/CMakeFiles/libdissect.dir/src/buffer.c.o"
+  "/Users/cwood/Projects/dissect/src/capture.c" "/Users/cwood/Projects/dissect/CMakeFiles/libdissect.dir/src/capture.c.o"
   "/Users/cwood/Projects/dissect/src/packet.c" "/Users/cwood/Projects/dissect/CMakeFiles/libdissect.dir/src/packet.c.o"
   "/Users/cwood/Projects/dissect/src/tlv.c" "/Users/cwood/Projects/dissect/CMakeFiles/libdissect.dir/src/tlv.c.o"
   )

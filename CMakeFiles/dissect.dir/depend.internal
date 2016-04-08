@@ -3,6 +3,7 @@
 
 CMakeFiles/dissect.dir/src/dissect.c.o
  /Users/cwood/Projects/dissect/src/buffer.h
+ /Users/cwood/Projects/dissect/src/capture.h
  /Users/cwood/Projects/dissect/src/dissect.c
  /Users/cwood/Projects/dissect/src/packet.h
  /Users/cwood/Projects/dissect/src/tlv.h

@@ -7,6 +7,7 @@
 #include <getopt.h>
 
 #include "packet.h"
+#include "capture.h"
 
 // usage:
 // - read from stdin and dump to stdout
@@ -79,4 +80,6 @@ main(int argc, char **argv)
 
         // TODO: this is where we would implement the reporter
     }
+
+    capture();
 }

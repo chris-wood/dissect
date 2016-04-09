@@ -20,13 +20,21 @@ typedef enum {
     _OutputFormat_Invalid
 } _OutputFormat;
 
+typedef enum {
+    _Protocol_TCP = 0x00,
+    _Protocol_UDP = 0x01,
+    _Protocol_ETF = 0x02,
+} _Protocol;
+
 void
 _showUsage(char *programName)
 {
     printf("%s: CCNx packet dissector.\n", programName);
     printf("\n");
-    printf("Usage: %s [-h] [-o (json | csv)]\n", programName);
+    printf("Usage: %s [-c [<device>:]<protocol>] [-h] [-o (json | csv)]\n", programName);
     printf("\n");
+    printf("  -c:          capture CCNx packets sent over the given protocol and optionally captured\n");
+    printf("               by the specified interface device, e.g., eth0\n");
     printf("  -o <format>: output the packet data in <format>, where <format> is JSON or CSV. \n");
     printf("  -h:          display this usage message\n");
 }
@@ -38,10 +46,11 @@ main(int argc, char **argv)
 {
     bool showUsage = false;
     char *cvalue = NULL;
+    char *deviceAndProtocol = NULL;
     _OutputFormat outputFormat = _OutputFormat_Invalid;
     int value = 0;
 
-    while ((value = getopt (argc, argv, "o:h")) != -1) {
+    while ((value = getopt (argc, argv, "o:c:h")) != -1) {
         switch (value) {
             case 'o':
                 cvalue = optarg;
@@ -52,6 +61,10 @@ main(int argc, char **argv)
                 } else {
                     showUsage = true;
                 }
+                break;
+            case 'c':
+                strcpy(deviceAndProtocol, optarg);
+                // TODO: parse using strtok
                 break;
             case 'h':
             default:

@@ -76,7 +76,7 @@ static TypespaceTreeNode validation_alg_types_node = {
     .numChildren = 0
 };
 
-static TypespaceTreeNode message_types_node = { //&(TypespaceTreeNode) {
+static TypespaceTreeNode message_types_node = {
     .types = message_types,
     .numTypes = sizeof(message_types),
     .children = NULL,
@@ -88,7 +88,7 @@ static TypespaceTreeNode *top_level_type_children[2] = {
     &validation_alg_types_node
 };
 
-static TypespaceTreeNode top_level_types_node = { // }&(TypespaceTreeNode) {
+static TypespaceTreeNode top_level_types_node = { 
     .types = top_level_types,
     .numTypes = sizeof(top_level_types),
     .children = top_level_type_children,
@@ -172,25 +172,48 @@ _packet_DisplayBody(TLV *root, int indentation)
     for (int i = 0; i < indentation; i++) {
         printf(" ");
     }
+
+    // Print the TL
     printf("%02x %02x %02x %02x\n", t1, t2, l1, l2);
+
+    // If the TLV has children, recursively display them. Otherwise, print out the value directly.
     if (tlv_GetNumberOfChildren(root) > 0) {
         for (int i = 0; i < tlv_GetNumberOfChildren(root); i++) {
             TLV *child = tlv_GetChildByIndex(root, i);
             _packet_DisplayBody(child, indentation + 2);
         }
     } else {
+        int inner_offset = 0; // the TLV value is a relative buffer overlay, so we need to use a TLV-specific offset when walking over its values
         while (length > 0) {
+            int width = 0;
             printf("%04x  ", offset);
+            width += 6;
             for (int i = 0; i < indentation + 2; i++) {
                 printf(" ");
+                width++;
             }
 
+            int count = 0;
             for (int i = 0; i < 8 && length > 0; i++) {
-                printf("%02x ", bufferOverlay_GetUint8(tlv_Value(root), offset));
+                printf("%02x ", bufferOverlay_GetUint8(tlv_Value(root), inner_offset));
                 length--;
-                offset++;
+                inner_offset++;
+                count++;
+                width += 3;
             }
-            printf("\n");
+
+            // Human-readable display.
+            // TODO: move the 50 to a magic number
+            inner_offset -= count;
+            for (int i = 0; i < 50 - width; i++) {
+                printf(" ");
+            }
+            printf("| ");
+            for (int i = 0; i < count; i++) {
+                printf("%c", bufferOverlay_GetUint8(tlv_Value(root), inner_offset));
+                inner_offset++;
+            }
+            printf(" |\n");
         }
     }
 

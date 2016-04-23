@@ -63,7 +63,7 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint
     tlv->length = length;
     tlv->sibling = NULL;
 
-    tlv->offset = offset;
+    tlv->offset = offset; // this is an absolute offset into the packet buffer
     tlv->value = bufferOverlay_CreateFromBuffer(packet, offset, length);
 
     if (_tlv_HasInnerTLV(tlv, length)) {

@@ -2,6 +2,6 @@
 
 CCNx packet dissector. Planned features:
 
-- Simple API to get specific TLVs in a packet.
+- JSON and CSV output formatters.
+- pcap capture and parsing support.
 - SQL-based API to extract arbitrary rows from a packet.
-- pcap file handling.

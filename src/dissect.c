@@ -91,6 +91,7 @@ main(int argc, char **argv)
         Packet *packet = packet_CreateFromBuffer(packetBuffer);
         packet_Display(packet, 0);
 
+        // TODO: need to write code that will peek on next packet, if it's in the buffer
         // TODO: this is where we would implement the reporter
     }
 

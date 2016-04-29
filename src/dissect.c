@@ -9,6 +9,8 @@
 #include "packet.h"
 #include "capture.h"
 
+#define BUFFER_SIZE 64000
+
 // usage:
 // - read from stdin and dump to stdout
 // - specify filters (as SQL query or a list of fields to extract)
@@ -26,7 +28,7 @@ typedef enum {
     _Protocol_ETF = 0x02,
 } _Protocol;
 
-void
+static void
 _showUsage(char *programName)
 {
     printf("%s: CCNx packet dissector.\n", programName);
@@ -38,8 +40,6 @@ _showUsage(char *programName)
     printf("  -o <format>: output the packet data in <format>, where <format> is JSON or CSV. \n");
     printf("  -h:          display this usage message\n");
 }
-
-#define BUFFER_SIZE 64000
 
 int
 main(int argc, char **argv)
@@ -80,18 +80,38 @@ main(int argc, char **argv)
 
     // The buffer to store a single packet at a time (64KB is the max packet size).
     char buffer[BUFFER_SIZE];
+    size_t offset = 0;
+
+    bool isMore = fgets(buffer, BUFFER_SIZE, stdin) != NULL;
+    size_t bufferSize = BUFFER_SIZE;
+    size_t tail = bufferSize;
+    size_t packetNumber = 0;
 
     // Start reading from the command line
-    while (fgets(buffer, BUFFER_SIZE, stdin)) {
-        // Peek at length
+    while (isMore) {
+        // Peek at length and fill in the tail of the buffer if necessary
         uint16_t length = ((uint16_t)(buffer[2]) << 8) | (uint16_t)(buffer[3]);
+        if (length == 0) {
+            break;
+        } else if (length > tail) {
+            fgets(buffer + tail, BUFFER_SIZE - tail, stdin);
+        }
 
-        // Create and display the packet
+        // Create the packet
         Buffer *packetBuffer = buffer_CreateFromArray((uint8_t *) buffer, length);
         Packet *packet = packet_CreateFromBuffer(packetBuffer);
+
+        // Display the packet
+        printf("########### \n");
+        printf("## PKT %zu \n", packetNumber++);
+        printf("########### \n");
         packet_Display(packet, 0);
 
-        // TODO: need to write code that will peek on next packet, if it's in the buffer
+        // Update the offset and shift down the rest of the buffer contents
+        memcpy(buffer, buffer + length, bufferSize - length);
+        memset(buffer + tail, 0, bufferSize - tail);
+        tail = BUFFER_SIZE - length;
+
         // TODO: this is where we would implement the reporter
     }
 

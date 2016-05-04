@@ -9,8 +9,6 @@
 #include "packet.h"
 #include "capture.h"
 
-#define BUFFER_SIZE 64000
-
 // usage:
 // - read from stdin and dump to stdout
 // - specify filters (as SQL query or a list of fields to extract)
@@ -22,23 +20,18 @@ typedef enum {
     _OutputFormat_Invalid
 } _OutputFormat;
 
-typedef enum {
-    _Protocol_TCP = 0x00,
-    _Protocol_UDP = 0x01,
-    _Protocol_ETF = 0x02,
-} _Protocol;
-
 static void
 _showUsage(char *programName)
 {
     printf("%s: CCNx packet dissector.\n", programName);
     printf("\n");
-    printf("Usage: %s [-c [<device>:]<protocol>] [-h] [-o (json | csv)]\n", programName);
+    printf("Usage: %s [-h] [-c <device>] [-t <pcap filter>] [-f <file name>] [-o (json | csv)]\n", programName);
     printf("\n");
-    printf("  -c:          capture CCNx packets sent over the given protocol and optionally captured\n");
-    printf("               by the specified interface device, e.g., eth0\n");
-    printf("  -o <format>: output the packet data in <format>, where <format> is JSON or CSV. \n");
-    printf("  -h:          display this usage message\n");
+    printf("  -c <device>:                the device from which to capture live packets \n");
+    printf("  -t <traffic filter string>: filter traffic for the live capture with this filter string (see pcap_filter() for details).\n");
+    printf("  -f <file name>:             name of the file from which to read packets.\n");
+    printf("  -o <format>:                output the packet data in <format>, where <format> is JSON or CSV. \n");
+    printf("  -h:                         display this usage message\n");
 }
 
 int
@@ -46,11 +39,25 @@ main(int argc, char **argv)
 {
     bool showUsage = false;
     char *cvalue = NULL;
-    char *deviceAndProtocol = NULL;
-    _OutputFormat outputFormat = _OutputFormat_Invalid;
+    char *deviceString = NULL;
+    char *filterString = NULL;
+    char *fileName = NULL;
     int value = 0;
+    bool liveMode = false;
+    bool fileMode = false;
 
-    while ((value = getopt (argc, argv, "o:c:h")) != -1) {
+    _OutputFormat outputFormat = _OutputFormat_Invalid;
+
+    static struct option longopts[] = {
+        { "output",         required_argument, NULL, 'o' },
+        { "capture",        required_argument, NULL, 'c' },
+        { "traffic_filter", required_argument, NULL, 't' },
+        { "file",           required_argument, NULL, 'f' },
+        { "help",           no_argument,       NULL, 'h' },
+        { NULL,             0,                 NULL, 0   }
+    };
+
+    while ((value = getopt_long(argc, argv, "o:c:t:f:h", longopts, NULL)) != -1) {
         switch (value) {
             case 'o':
                 cvalue = optarg;
@@ -63,8 +70,15 @@ main(int argc, char **argv)
                 }
                 break;
             case 'c':
-                strcpy(deviceAndProtocol, optarg);
-                // TODO: parse using strtok
+                asprintf(&deviceString, "%s", optarg);
+                liveMode = true;
+                break;
+            case 't':
+                asprintf(&filterString, "%s", optarg);
+                break;
+            case 'f':
+                asprintf(&fileName, "%s", optarg);
+                fileMode = true;
                 break;
             case 'h':
             default:
@@ -78,42 +92,20 @@ main(int argc, char **argv)
         exit(0);
     }
 
+    Reporter *reporter = reporter_CreateRawFileReporter(stdout);
+
     // The buffer to store a single packet at a time (64KB is the max packet size).
-    char buffer[BUFFER_SIZE];
-    size_t offset = 0;
-
-    bool isMore = fgets(buffer, BUFFER_SIZE, stdin) != NULL;
-    size_t bufferSize = BUFFER_SIZE;
-    size_t tail = bufferSize;
-    size_t packetNumber = 0;
-
-    // Start reading from the command line
-    while (isMore) {
-        // Peek at length and fill in the tail of the buffer if necessary
-        uint16_t length = ((uint16_t)(buffer[2]) << 8) | (uint16_t)(buffer[3]);
-        if (length == 0) {
-            break;
-        } else if (length > tail) {
-            fgets(buffer + tail, BUFFER_SIZE - tail, stdin);
+    if (liveMode) {
+        captureFromDevice(reporter, deviceString, filterString);
+    } else if (fileMode) {
+        FILE *inputFile = fopen(fileName, "rb");
+        if (inputFile != NULL) {
+            captureFromFile(reporter, inputFile);
+            fclose(inputFile);
+        } else {
+            fprintf(stderr, "Error: unable to open %s for reading\n", fileName);
         }
-
-        // Create the packet
-        Buffer *packetBuffer = buffer_CreateFromArray((uint8_t *) buffer, length);
-        Packet *packet = packet_CreateFromBuffer(packetBuffer);
-
-        // Display the packet
-        printf("########### \n");
-        printf("## PKT %zu \n", packetNumber++);
-        printf("########### \n");
-        packet_Display(packet, 0);
-
-        // Update the offset and shift down the rest of the buffer contents
-        memcpy(buffer, buffer + length, bufferSize - length);
-        memset(buffer + tail, 0, bufferSize - tail);
-        tail = BUFFER_SIZE - length;
-
-        // TODO: this is where we would implement the reporter
+    } else {
+        captureFromFile(reporter, stdin);
     }
-
-    capture();
 }

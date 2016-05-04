@@ -88,7 +88,7 @@ static TypespaceTreeNode *top_level_type_children[2] = {
     &validation_alg_types_node
 };
 
-static TypespaceTreeNode top_level_types_node = { 
+static TypespaceTreeNode top_level_types_node = {
     .types = top_level_types,
     .numTypes = sizeof(top_level_types),
     .children = top_level_type_children,
@@ -147,18 +147,18 @@ packet_GetNextTLV(Packet *packet, uint32_t offset, uint32_t limit)
 }
 
 static void
-_packet_DisplayFixedHeader(Packet *packet, int indentation)
+_packet_DisplayFixedHeader(Packet *packet, FILE *fp, int indentation)
 {
     // Print
-    printf("%04x  Version    = %d\n", 0x00, packet_GetVersion(packet));
-    printf("%04x  PacketType = %d\n", 0x01, packet_GetType(packet));
-    printf("%04x  PacketLen  = %d\n", 0x02, packet_GetLength(packet));
-    printf("%04x  HeaderLen  = %d\n", 0x07, packet_GetHeaderLength(packet));
-    printf("%04x  HeaderEnd\n", 0x08);
+    fprintf(fp, "%04x  Version    = %d\n", 0x00, packet_GetVersion(packet));
+    fprintf(fp, "%04x  PacketType = %d\n", 0x01, packet_GetType(packet));
+    fprintf(fp, "%04x  PacketLen  = %d\n", 0x02, packet_GetLength(packet));
+    fprintf(fp, "%04x  HeaderLen  = %d\n", 0x07, packet_GetHeaderLength(packet));
+    fprintf(fp, "%04x  HeaderEnd\n", 0x08);
 }
 
 static void
-_packet_DisplayBody(TLV *root, int indentation)
+_packet_DisplayBody(TLV *root, FILE *fp, int indentation)
 {
     uint16_t type = tlv_Type(root);
     uint8_t t1 = (type >> 8) & 0xFF;
@@ -168,34 +168,34 @@ _packet_DisplayBody(TLV *root, int indentation)
     uint8_t l2 = length & 0xFF;
 
     uint32_t offset = tlv_AbsoluteOffset(root);
-    printf("%04x  ", offset - 4);
+    fprintf(fp, "%04x  ", offset - 4);
     for (int i = 0; i < indentation; i++) {
-        printf(" ");
+        fprintf(fp, " ");
     }
 
     // Print the TL
-    printf("%02x %02x %02x %02x\n", t1, t2, l1, l2);
+    fprintf(fp, "%02x %02x %02x %02x\n", t1, t2, l1, l2);
 
     // If the TLV has children, recursively display them. Otherwise, print out the value directly.
     if (tlv_GetNumberOfChildren(root) > 0) {
         for (int i = 0; i < tlv_GetNumberOfChildren(root); i++) {
             TLV *child = tlv_GetChildByIndex(root, i);
-            _packet_DisplayBody(child, indentation + 2);
+            _packet_DisplayBody(child, fp, indentation + 2);
         }
     } else {
         int inner_offset = 0; // the TLV value is a relative buffer overlay, so we need to use a TLV-specific offset when walking over its values
         while (length > 0) {
             int width = 0;
-            printf("%04x  ", offset);
+            fprintf(fp, "%04x  ", offset);
             width += 6;
             for (int i = 0; i < indentation + 2; i++) {
-                printf(" ");
+                fprintf(fp, " ");
                 width++;
             }
 
             int count = 0;
             for (int i = 0; i < 8 && length > 0; i++) {
-                printf("%02x ", bufferOverlay_GetUint8(tlv_Value(root), inner_offset));
+                fprintf(fp, "%02x ", bufferOverlay_GetUint8(tlv_Value(root), inner_offset));
                 length--;
                 inner_offset++;
                 count++;
@@ -206,21 +206,21 @@ _packet_DisplayBody(TLV *root, int indentation)
             // TODO: move the 50 to a magic number
             inner_offset -= count;
             for (int i = 0; i < 50 - width; i++) {
-                printf(" ");
+                fprintf(fp, " ");
             }
-            printf("| ");
+            fprintf(fp, "| ");
             for (int i = 0; i < count; i++) {
-                printf("%c", bufferOverlay_GetUint8(tlv_Value(root), inner_offset));
+                fprintf(fp, "%c", bufferOverlay_GetUint8(tlv_Value(root), inner_offset));
                 inner_offset++;
             }
-            printf(" |\n");
+            fprintf(fp, " |\n");
         }
     }
 
     // Now display the sibling at the same depth
     TLV *sibling = tlv_GetSibling(root);
     if (sibling != NULL) {
-        _packet_DisplayBody(sibling, indentation);
+        _packet_DisplayBody(sibling, fp, indentation);
     }
 }
 
@@ -228,10 +228,10 @@ _packet_DisplayBody(TLV *root, int indentation)
 // 40 columns for packet data
 // 12 columns for raw output
 void
-packet_Display(Packet *packet, int indentation)
+packet_Display(Packet *packet, FILE *fp, int indentation)
 {
-    _packet_DisplayFixedHeader(packet, indentation);
-    _packet_DisplayBody(packet->startTLV, indentation);
+    _packet_DisplayFixedHeader(packet, fp, indentation);
+    _packet_DisplayBody(packet->startTLV, fp, indentation);
 }
 
 static void

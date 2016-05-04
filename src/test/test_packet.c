@@ -60,7 +60,7 @@ static void test_packet_Create_FromInterest(void **state)
         Packet *packet = packet_CreateFromBuffer(buffer);
         assert_true(packet != NULL);
 
-        packet_Display(packet, 0);
+        packet_Display(packet, stdout, 0);
     } else {
         assert_true(false);
     }
@@ -76,7 +76,7 @@ static void test_packet_Create_FromData(void **state)
         Packet *packet = packet_CreateFromBuffer(buffer);
         assert_true(packet != NULL);
 
-        packet_Display(packet, 0);
+        packet_Display(packet, stdout, 0);
     } else {
         assert_true(false);
     }

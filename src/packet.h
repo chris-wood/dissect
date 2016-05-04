@@ -56,7 +56,7 @@ uint16_t packet_GetLength(Packet *packet);
 uint16_t packet_GetHeaderLength(Packet *packet);
 
 // debug
-void packet_Display(Packet *packet, int indentation);
+void packet_Display(Packet *packet, FILE *fp, int indentation);
 
 // absolute packet fields
 Buffer *packet_GetFieldValue(Packet *packet, PacketField field);

@@ -12,6 +12,8 @@ set(SOURCE_FILES
     src/tlv.h
     src/capture.c
     src/capture.h
+    src/reporter.c
+    src/reporter.h
     src/util.h
     )
 

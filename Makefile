@@ -257,6 +257,33 @@ src/packet.c.s:
 	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/packet.c.s
 .PHONY : src/packet.c.s
 
+src/reporter.o: src/reporter.c.o
+
+.PHONY : src/reporter.o
+
+# target to build an object file
+src/reporter.c.o:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/reporter.c.o
+.PHONY : src/reporter.c.o
+
+src/reporter.i: src/reporter.c.i
+
+.PHONY : src/reporter.i
+
+# target to preprocess a source file
+src/reporter.c.i:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/reporter.c.i
+.PHONY : src/reporter.c.i
+
+src/reporter.s: src/reporter.c.s
+
+.PHONY : src/reporter.s
+
+# target to generate assembly for a file
+src/reporter.c.s:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/reporter.c.s
+.PHONY : src/reporter.c.s
+
 src/test/test_packet.o: src/test/test_packet.c.o
 
 .PHONY : src/test/test_packet.o
@@ -334,6 +361,9 @@ help:
 	@echo "... src/packet.o"
 	@echo "... src/packet.i"
 	@echo "... src/packet.s"
+	@echo "... src/reporter.o"
+	@echo "... src/reporter.i"
+	@echo "... src/reporter.s"
 	@echo "... src/test/test_packet.o"
 	@echo "... src/test/test_packet.i"
 	@echo "... src/test/test_packet.s"

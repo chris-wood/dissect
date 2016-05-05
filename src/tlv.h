@@ -1,6 +1,7 @@
 #ifndef tlv_h_
 #define tlv_h_
 
+#include "packet_field.h"
 #include "buffer.h"
 #include "util.h"
 

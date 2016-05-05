@@ -70,7 +70,6 @@ captureFromFile(Reporter *reporter, FILE *file)
         Packet *packet = packet_CreateFromBuffer(packetBuffer);
 
         // Display the packet
-        // reporter_Report(reporter, packet);
         packet_Report(packet, reporter);
 
         // Update the offset and shift down the rest of the buffer contents

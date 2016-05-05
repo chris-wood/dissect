@@ -8,6 +8,8 @@
 #include "buffer.h"
 #include "util.h"
 #include "tlv.h"
+#include "reporter.h"
+#include "packet_field.h"
 
 struct packet;
 typedef struct packet Packet;
@@ -25,28 +27,6 @@ typedef enum {
     PacketType_Invalid
 } PacketType;
 
-typedef enum {
-    // Message "header"
-    PacketField_Name,
-    PacketField_KeyIdRestriction,
-    PacketField_ContentObjectHashRestriction,
-
-    // Message internals (payload)
-    PacketField_Payload,
-
-    // ValidationAlgorithm
-    PacketField_ValidationAlgKeyId,
-    PacketField_ValidationAlgPublicKey,
-    PacketField_ValidationAlgCert,
-    PacketField_ValidationAlgKeyName,
-    PacketField_ValidationAlgSigTime,
-
-    // ValidationPayload
-    PacketField_ValidationPayload,
-
-    PacketField_Invalid
-} PacketField;
-
 Packet *packet_CreateFromBuffer(Buffer *buffer);
 
 // general packet stuff
@@ -55,8 +35,9 @@ PacketType packet_GetType(Packet *packet);
 uint16_t packet_GetLength(Packet *packet);
 uint16_t packet_GetHeaderLength(Packet *packet);
 
-// debug
+// displaying and reporting func
 void packet_Display(Packet *packet, FILE *fp, int indentation);
+void packet_Report(Packet *packet, Reporter *reporter);
 
 // absolute packet fields
 Buffer *packet_GetFieldValue(Packet *packet, PacketField field);

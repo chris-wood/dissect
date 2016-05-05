@@ -1,5 +1,8 @@
+#include <stdbool.h>
+
 #include <pcap/pcap.h>
 
+#include "packet.h"
 #include "capture.h"
 
 #define BUFFER_SIZE 64000
@@ -67,7 +70,8 @@ captureFromFile(Reporter *reporter, FILE *file)
         Packet *packet = packet_CreateFromBuffer(packetBuffer);
 
         // Display the packet
-        reporter_Report(reporter, packet);
+        // reporter_Report(reporter, packet);
+        packet_Report(packet, reporter);
 
         // Update the offset and shift down the rest of the buffer contents
         memcpy(buffer, buffer + length, bufferSize - length);

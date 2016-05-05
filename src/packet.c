@@ -234,6 +234,16 @@ packet_Display(Packet *packet, FILE *fp, int indentation)
     _packet_DisplayBody(packet->startTLV, fp, indentation);
 }
 
+void
+packet_Report(Packet *packet, Reporter *reporter)
+{
+    if (reporter_IsRaw(reporter)) {
+        packet_Display(packet, reporter_GetFileDescriptor(reporter), 0);
+    } else {
+        printf("do something else!\n");
+    }
+}
+
 static void
 _packet_ExtractHeader(Packet *packet)
 {

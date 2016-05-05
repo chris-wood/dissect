@@ -6,8 +6,8 @@
 
 #include "reporter.h"
 
-void captureFromFile(Reporter *reporter, FILE *file);
+int captureFromFile(Reporter *reporter, FILE *file);
 
-void captureFromDevice(Reporter *reporter, char *device, char *filter);
+int captureFromDevice(Reporter *reporter, char *device, char *filter);
 
 #endif // dissect_capture_h_

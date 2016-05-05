@@ -7,43 +7,55 @@
 
 #define BUFFER_SIZE 64000
 
-void
+int
 captureFromDevice(Reporter *reporter, char *device, char *filter)
 {
-    // TODO
     // http://www.manpagez.com/man/7/pcap-filter/
     // http://www.tcpdump.org/pcap.html
 
-    // TODO: snippet from the above link
-    // pcap_t *handle;		/* Session handle */
-    // char dev[] = "rl0";		/* Device to sniff on */
-    // char errbuf[PCAP_ERRBUF_SIZE];	/* Error string */
-    // struct bpf_program fp;		/* The compiled filter expression */
-    // char filter_exp[] = "port 23";	/* The filter expression */
-    // bpf_u_int32 mask;		/* The netmask of our sniffing device */
-    // bpf_u_int32 net;		/* The IP of our sniffing device */
-    //
-    // if (pcap_lookupnet(dev, &net, &mask, errbuf) == -1) {
-    //     fprintf(stderr, "Can't get netmask for device %s\n", dev);
-    //     net = 0;
-    //     mask = 0;
-    // }
-    // handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
-    // if (handle == NULL) {
-    //     fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
-    //     return(2);
-    // }
-    // if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
-    //     fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
-    //     return(2);
-    // }
-    // if (pcap_setfilter(handle, &fp) == -1) {
-    //     fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
-    //     return(2);
-    // }
+    pcap_t *handle;
+    char errbuf[PCAP_ERRBUF_SIZE];
+    struct bpf_program fp;
+    bpf_u_int32 mask;
+    bpf_u_int32 net;
+
+    if (pcap_lookupnet(device, &net, &mask, errbuf) == -1) {
+        fprintf(stderr, "Can't get netmask for device %s\n", device);
+        net = 0;
+        mask = 0;
+    }
+    handle = pcap_open_live(device, BUFSIZ, 1, 1000, errbuf);
+    if (handle == NULL) {
+        fprintf(stderr, "Couldn't open device %s: %s\n", device, errbuf);
+        return -1;
+    }
+    if (pcap_compile(handle, &fp, filter, 0, net) == -1) {
+        fprintf(stderr, "Couldn't parse filter %s: %s\n", filter, pcap_geterr(handle));
+        return -2;
+    }
+    if (pcap_setfilter(handle, &fp) == -1) {
+        fprintf(stderr, "Couldn't install filter %s: %s\n", filter, pcap_geterr(handle));
+        return -3;
+    }
+
+    struct pcap_pkthdr *header = NULL;
+    const u_char *data = NULL;
+
+    while (pcap_next_ex(handle, &header, &data)) {
+        uint16_t length = ((uint16_t)(data[2]) << 8) | (uint16_t)(data[3]);
+
+        // Create the packet
+        Buffer *packetBuffer = buffer_CreateFromArray((uint8_t *) data, length);
+        Packet *packet = packet_CreateFromBuffer(packetBuffer);
+
+        // Display the packet
+        packet_Report(packet, reporter);
+    }
+
+    return 0;
 }
 
-void
+int
 captureFromFile(Reporter *reporter, FILE *file)
 {
     // The buffer to store a single packet at a time (64KB is the max packet size).
@@ -77,4 +89,6 @@ captureFromFile(Reporter *reporter, FILE *file)
         memset(buffer + tail, 0, bufferSize - tail);
         tail = BUFFER_SIZE - length;
     }
+
+    return 0;
 }

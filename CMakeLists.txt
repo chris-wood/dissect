@@ -25,7 +25,7 @@ include_directories(src)
 
 add_library(libdissect ${SOURCE_FILES})
 add_executable(dissect src/dissect.c)
-target_link_libraries(dissect libdissect)
+target_link_libraries(dissect libdissect pcap)
 
 add_executable(test_packet src/test/test_packet.c)
-target_link_libraries(test_packet libdissect cmocka)
+target_link_libraries(test_packet libdissect cmocka pcap)

@@ -32,7 +32,6 @@ static uint16_t message_types[8] = {
     CCNxTypespace_CCNxMessage_ContentObjectHashRestriction,
     CCNxTypespace_CCNxMessage_PayloadType,
     CCNxTypespace_CCNxMessage_ExpiryTime,
-    CCNxTypespace_CCNxMessage_HashGroup,
     CCNxTypespace_CCNxMessage_EndChunkNumber
 };
 

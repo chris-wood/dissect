@@ -66,6 +66,12 @@ reporter_GetFileDescriptor(Reporter *reporter)
     return reporter->getFileDescriptor(reporter->context);
 }
 
+void
+reporter_ReportField(Reporter *reporter, PacketField field, Buffer *buffer)
+{
+
+}
+
 // void
 // reporter_Report(Reporter *reporter, Packet *packet)
 // {

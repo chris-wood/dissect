@@ -5,7 +5,6 @@ struct tlv {
     // The type and length of thi TLV
     uint16_t type;
     uint16_t length;
-    PacketField absoluteField;
 
     // Overlay onto packet buffer that stores the value
     BufferOverlay *value;

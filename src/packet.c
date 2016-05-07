@@ -8,7 +8,6 @@
 #include "types.h"
 #include "tlv.h"
 
-// Static type space tree
 static uint16_t header_types[4] = {
     CCNxTypespace_OptionalHeaders_InterestLifetime,
     CCNxTypespace_OptionalHeaders_RecommendedCacheTime,
@@ -46,10 +45,6 @@ static uint16_t validation_alg_types[9] = {
     CCNxTypespace_ValidationAlg_KeyName,
     CCNxTypespace_ValidationAlg_SigTime
 };
-
-///////
-// TODO: finish the rest of the typespace here
-///////
 
 // A generic node that we can use to stich together the typespace tree
 struct typespace_tree_node;
@@ -236,11 +231,15 @@ packet_Display(Packet *packet, FILE *fp, int indentation)
 void
 packet_Report(Packet *packet, Reporter *reporter)
 {
+    reporter_StartPacket(reporter);
+
     if (reporter_IsRaw(reporter)) {
         packet_Display(packet, reporter_GetFileDescriptor(reporter), 0);
     } else {
-        printf("do something else!\n");
+        // TODO: walk the TLV tree and call `reporter_Report(reporter, numTypes, typeTree, value)` on each
     }
+    
+    reporter_EndPacket(reporter);
 }
 
 static void

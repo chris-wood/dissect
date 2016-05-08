@@ -1,6 +1,8 @@
 #ifndef types_h_
 #define types_h_
 
+#include "util.h"
+
 typedef enum rta_tlv_schema_v1_packet_type {
     CCNxTypespace_PacketType_Interest = 0x00,
     CCNxTypespace_PacketType_ContentObject = 0x01,
@@ -83,5 +85,126 @@ typedef enum rta_tlv_schema_v1_interestreturncode_types {
     CCNxTypespace_InterestReturnCode_Congestion = 0x06,
     CCNxTypespace_InterestReturnCode_MTUTooLarge = 0x07,
 } CCNxTypespace_InterestReturnCode;
+
+static uint16_t header_types[4] = {
+    CCNxTypespace_OptionalHeaders_InterestLifetime,
+    CCNxTypespace_OptionalHeaders_RecommendedCacheTime,
+    CCNxTypespace_OptionalHeaders_InterestFragment,
+    CCNxTypespace_OptionalHeaders_ContentObjectFragment
+};
+
+static uint16_t top_level_types[6] = {
+    CCNxTypespace_MessageType_Interest,
+    CCNxTypespace_MessageType_ContentObject,
+    CCNxTypespace_MessageType_ValidationAlg,
+    CCNxTypespace_MessageType_ValidationPayload,
+    CCNxTypespace_MessageType_Manifest,
+    CCNxTypespace_MessageType_Control
+};
+
+static char *top_level_type_strings[6] = {
+    "CCNxTypespace_MessageType_Interest",
+    "CCNxTypespace_MessageType_ContentObject",
+    "CCNxTypespace_MessageType_ValidationAlg",
+    "CCNxTypespace_MessageType_ValidationPayload",
+    "CCNxTypespace_MessageType_Manifest",
+    "CCNxTypespace_MessageType_Control"
+};
+
+static uint16_t message_types[8] = {
+    CCNxTypespace_CCNxMessage_Name,
+    CCNxTypespace_CCNxMessage_Payload,
+    CCNxTypespace_CCNxMessage_KeyIdRestriction,
+    CCNxTypespace_CCNxMessage_ContentObjectHashRestriction,
+    CCNxTypespace_CCNxMessage_PayloadType,
+    CCNxTypespace_CCNxMessage_ExpiryTime,
+    CCNxTypespace_CCNxMessage_EndChunkNumber
+};
+
+static char *message_type_strings[8] = {
+    "CCNxTypespace_CCNxMessage_Name",
+    "CCNxTypespace_CCNxMessage_Payload",
+    "CCNxTypespace_CCNxMessage_KeyIdRestriction",
+    "CCNxTypespace_CCNxMessage_ContentObjectHashRestriction",
+    "CCNxTypespace_CCNxMessage_PayloadType",
+    "CCNxTypespace_CCNxMessage_ExpiryTime",
+    "CCNxTypespace_CCNxMessage_EndChunkNumber"
+};
+
+static uint16_t validation_alg_types[9] = {
+    CCNxTypespace_ValidationAlg_CRC32C,
+    CCNxTypespace_ValidationAlg_HMAC_SHA256,
+    CCNxTypespace_ValidationAlg_RSA_SHA256,
+    CCNxTypespace_ValidationAlg_EC_SECP_256K1,
+    CCNxTypespace_ValidationAlg_KeyId,
+    CCNxTypespace_ValidationAlg_PublicKey,
+    CCNxTypespace_ValidationAlg_Cert,
+    CCNxTypespace_ValidationAlg_KeyName,
+    CCNxTypespace_ValidationAlg_SigTime
+};
+
+static char *validation_alg_type_strings[9] = {
+    "CCNxTypespace_ValidationAlg_CRC32C",
+    "CCNxTypespace_ValidationAlg_HMAC_SHA256",
+    "CCNxTypespace_ValidationAlg_RSA_SHA256",
+    "CCNxTypespace_ValidationAlg_EC_SECP_256K1",
+    "CCNxTypespace_ValidationAlg_KeyId",
+    "CCNxTypespace_ValidationAlg_PublicKey",
+    "CCNxTypespace_ValidationAlg_Cert",
+    "CCNxTypespace_ValidationAlg_KeyName",
+    "CCNxTypespace_ValidationAlg_SigTime"
+};
+
+
+// A generic node that we can use to stich together the typespace tree
+struct typespace_tree_node;
+typedef struct typespace_tree_node {
+    uint16_t *types;
+    char **typeStrings;
+    uint16_t numTypes;
+
+    struct typespace_tree_node **children;
+    uint16_t numChildren;
+} TypespaceTreeNode;
+
+// TODO: remove the header part... it's not in the rest of the TLV tree space
+static TypespaceTreeNode header_root = {
+    .types = header_types,
+    .typeStrings = NULL,
+    .numTypes = sizeof(header_types),
+    .children = NULL,
+    .numChildren = 0
+};
+
+static TypespaceTreeNode validation_alg_types_node = {
+    .types = top_level_types,
+    .typeStrings = validation_alg_type_strings,
+    .numTypes = sizeof(top_level_types),
+    .children = NULL,
+    .numChildren = 0
+};
+
+static TypespaceTreeNode message_types_node = {
+    .types = message_types,
+    .typeStrings = message_type_strings,
+    .numTypes = sizeof(message_types),
+    .children = NULL,
+    .numChildren = 0
+};
+
+static TypespaceTreeNode *top_level_type_children[2] = {
+    &message_types_node,
+    &validation_alg_types_node
+};
+
+static TypespaceTreeNode top_level_types_node = {
+    .types = top_level_types,
+    .typeStrings = top_level_type_strings,
+    .numTypes = sizeof(top_level_types),
+    .children = top_level_type_children,
+    .numChildren = sizeof(top_level_type_children)
+};
+
+char *types_TreeToString(uint32_t numberOfTypes, uint16_t type[numberOfTypes]);
 
 #endif

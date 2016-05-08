@@ -28,6 +28,7 @@ uint16_t buffer_GetWordAtOffset(Buffer *b, uint32_t offset);
 uint16_t bufferOverlay_GetWordAtOffset(BufferOverlay *b, uint32_t offset);
 
 void buffer_Display(Buffer *b, int indentation);
+char *buffer_ToString(Buffer *b);
 void buffer_DisplayHex(Buffer *b, int indentation);
 Buffer *buffer_CreateEmpty();
 Buffer *buffer_CreateFromArray(uint8_t *bytes, size_t length);

@@ -8,87 +8,6 @@
 #include "types.h"
 #include "tlv.h"
 
-static uint16_t header_types[4] = {
-    CCNxTypespace_OptionalHeaders_InterestLifetime,
-    CCNxTypespace_OptionalHeaders_RecommendedCacheTime,
-    CCNxTypespace_OptionalHeaders_InterestFragment,
-    CCNxTypespace_OptionalHeaders_ContentObjectFragment
-};
-
-static uint16_t top_level_types[6] = {
-    CCNxTypespace_MessageType_Interest,
-    CCNxTypespace_MessageType_ContentObject,
-    CCNxTypespace_MessageType_ValidationAlg,
-    CCNxTypespace_MessageType_ValidationPayload,
-    CCNxTypespace_MessageType_Manifest,
-    CCNxTypespace_MessageType_Control
-};
-
-static uint16_t message_types[8] = {
-    CCNxTypespace_CCNxMessage_Name,
-    CCNxTypespace_CCNxMessage_Payload,
-    CCNxTypespace_CCNxMessage_KeyIdRestriction,
-    CCNxTypespace_CCNxMessage_ContentObjectHashRestriction,
-    CCNxTypespace_CCNxMessage_PayloadType,
-    CCNxTypespace_CCNxMessage_ExpiryTime,
-    CCNxTypespace_CCNxMessage_EndChunkNumber
-};
-
-static uint16_t validation_alg_types[9] = {
-    CCNxTypespace_ValidationAlg_CRC32C,
-    CCNxTypespace_ValidationAlg_HMAC_SHA256,
-    CCNxTypespace_ValidationAlg_RSA_SHA256,
-    CCNxTypespace_ValidationAlg_EC_SECP_256K1,
-    CCNxTypespace_ValidationAlg_KeyId,
-    CCNxTypespace_ValidationAlg_PublicKey,
-    CCNxTypespace_ValidationAlg_Cert,
-    CCNxTypespace_ValidationAlg_KeyName,
-    CCNxTypespace_ValidationAlg_SigTime
-};
-
-// A generic node that we can use to stich together the typespace tree
-struct typespace_tree_node;
-typedef struct typespace_tree_node {
-    uint16_t *types;
-    uint16_t numTypes;
-
-    struct typespace_tree_node **children;
-    uint16_t numChildren;
-} TypespaceTreeNode;
-
-static TypespaceTreeNode header_root = {
-    .types = header_types,
-    .numTypes = sizeof(header_types),
-    .children = NULL,
-    .numChildren = 0
-};
-
-static TypespaceTreeNode validation_alg_types_node = {
-    .types = top_level_types,
-    .numTypes = sizeof(top_level_types),
-    .children = NULL,
-    .numChildren = 0
-};
-
-static TypespaceTreeNode message_types_node = {
-    .types = message_types,
-    .numTypes = sizeof(message_types),
-    .children = NULL,
-    .numChildren = 0
-};
-
-static TypespaceTreeNode *top_level_type_children[2] = {
-    &message_types_node,
-    &validation_alg_types_node
-};
-
-static TypespaceTreeNode top_level_types_node = {
-    .types = top_level_types,
-    .numTypes = sizeof(top_level_types),
-    .children = top_level_type_children,
-    .numChildren = sizeof(top_level_type_children)
-};
-
 typedef struct {
     uint8_t version;
     uint8_t packetType;
@@ -236,9 +155,25 @@ packet_Report(Packet *packet, Reporter *reporter)
     if (reporter_IsRaw(reporter)) {
         packet_Display(packet, reporter_GetFileDescriptor(reporter), 0);
     } else {
-        // TODO: walk the TLV tree and call `reporter_Report(reporter, numTypes, typeTree, value)` on each
+
+        // TODO this is just an example. I need a function to walk the entire TLV tree and call this at every node.
+        TLV *tlv = packet->startTLV;
+
+        uint16_t types[1] = {tlv_Type(tlv)};
+        Buffer *value = bufferOverlay_CreateBuffer(tlv_Value(tlv));
+        reporter_ReportTLV(reporter, 1, types, value);
     }
-    
+
+    // printf("\n\n\n");
+    // TLV *tlv = packet->startTLV;
+    // while (tlv_GetNumberOfChildren(tlv) > 0) {
+    //     tlv = tlv_GetChildByIndex(tlv, 0);
+    // }
+    //
+    // uint16_t types[1] = {tlv_Type(tlv)};
+    // Buffer *value = bufferOverlay_CreateBuffer(tlv_Value(tlv));
+    // reporter_ReportTLV(reporter, 1, types, value);
+
     reporter_EndPacket(reporter);
 }
 

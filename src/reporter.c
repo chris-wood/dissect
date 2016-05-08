@@ -8,9 +8,12 @@
 
 typedef struct {
     FILE *fp;
+    size_t numPackets;
 } _FileReporterContext;
 
 struct reporter {
+    void (*start)(void *);
+    void (*end)(void *);
     void (*reportFunction)(void *, uint32_t , uint16_t *, Buffer *);
     FILE *(*getFileDescriptor)(void *);
     void *context; // sloppy
@@ -26,12 +29,26 @@ _fileReporter_GetFileDescriptor(_FileReporterContext *context)
 void
 _fileReporter_Report(_FileReporterContext *context, uint32_t numberOfTypes, uint16_t type[numberOfTypes], Buffer *buffer)
 {
-    // packet_Display(packet, context->fp, 0);
-    // fprintf(context->fp, )
+    for (uint32_t i = 0; i < numberOfTypes; i++) {
+        fprintf(context->fp, " ");
+    }
 
-    // TODO: print "type strings (separated by /), =, value"
-    // e.g., Message/Interest/Name = helloworld
-    // TODO: indent by the number of types in the tree
+    char *typeString = types_TreeToString(numberOfTypes, type);
+    fprintf(context->fp, "%s: %s\n", typeString, buffer_ToString(buffer));
+
+    fprintf(context->fp, "\n");
+}
+
+void
+_fileReporter_Start(_FileReporterContext *context)
+{
+    fprintf(context->fp, "#### PACKET %zu\n", context->numPackets);
+}
+
+void
+_fileReporter_End(_FileReporterContext *context)
+{
+    fprintf(context->fp, "\n");
 }
 
 // TODO: need to write destructor functions
@@ -44,11 +61,14 @@ reporter_CreateRawFileReporter(FILE *fd)
 {
     Reporter *reporter = malloc(sizeof(Reporter));
     reporter->reportFunction = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _fileReporter_Report;
+    reporter->start = (void (*)(void *)) _fileReporter_Start;
+    reporter->end = (void (*)(void *)) _fileReporter_End;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _fileReporter_GetFileDescriptor;
     reporter->hasFilter = false;
 
     _FileReporterContext *context = malloc(sizeof(_FileReporterContext));
     context->fp = fd;
+    context->numPackets = 0;
     reporter->context = context;
 
     return reporter;
@@ -57,13 +77,13 @@ reporter_CreateRawFileReporter(FILE *fd)
 void
 reporter_StartPacket(Reporter *reporter)
 {
-    // TODO: add function for start method
+    reporter->start(reporter->context);
 }
 
 void
 reporter_EndPacket(Reporter *reporter)
 {
-    // TODO: add function for end method
+    reporter->end(reporter->context);
 }
 
 void

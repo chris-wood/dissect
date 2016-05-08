@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdlib.h>
-
+#include "util.h"
 #include "buffer.h"
 
 struct buffer {
@@ -76,6 +72,17 @@ uint8_t
 bufferOverlay_GetUint8(BufferOverlay *buffer, size_t offset)
 {
     return buffer->bytes[offset];
+}
+
+char *
+buffer_ToString(Buffer *b)
+{
+    char *string = malloc(b->length + 1);
+    for (int i = 0; i < b->length; i++) {
+        string[i] = b->bytes[i];
+    }
+    string[b->length] = '\0';
+    return string;
 }
 
 void

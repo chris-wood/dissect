@@ -1,0 +1,4 @@
+1. add TLV walking function to packet.c
+2. test with raw file reporter
+3. implement the JSON reporter
+4. define API/options for specifying filter fields (maybe in a file?)

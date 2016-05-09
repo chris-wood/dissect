@@ -70,6 +70,8 @@ _packet_DisplayFixedHeader(Packet *packet, FILE *fp, int indentation)
     fprintf(fp, "%04x  HeaderEnd\n", 0x08);
 }
 
+#define MAX_WIDTH 50
+
 static void
 _packet_DisplayBody(TLV *root, FILE *fp, int indentation)
 {
@@ -116,9 +118,8 @@ _packet_DisplayBody(TLV *root, FILE *fp, int indentation)
             }
 
             // Human-readable display.
-            // TODO: move the 50 to a magic number
             inner_offset -= count;
-            for (int i = 0; i < 50 - width; i++) {
+            for (int i = 0; i < MAX_WIDTH - width; i++) {
                 fprintf(fp, " ");
             }
             fprintf(fp, "| ");
@@ -137,9 +138,6 @@ _packet_DisplayBody(TLV *root, FILE *fp, int indentation)
     }
 }
 
-// 5 columns for hex offset
-// 40 columns for packet data
-// 12 columns for raw output
 void
 packet_Display(Packet *packet, FILE *fp, int indentation)
 {

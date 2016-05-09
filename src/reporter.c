@@ -34,7 +34,15 @@ _fileReporter_Report(_FileReporterContext *context, uint32_t numberOfTypes, uint
     }
 
     char *typeString = types_TreeToString(numberOfTypes, type);
-    fprintf(context->fp, "%s: %s\n", typeString, buffer_ToString(buffer));
+    if (typeString != NULL) {
+        if (buffer != NULL) {
+            char *bufferString = buffer_ToString(buffer);
+            fprintf(context->fp, "%s: %s\n", typeString, buffer_ToString(buffer));
+            free(bufferString);
+        } else {
+            fprintf(context->fp, "%s: \n", typeString);
+        }
+    }
 
     fprintf(context->fp, "\n");
 }

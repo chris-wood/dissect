@@ -23,7 +23,7 @@ _types_TreeToStringWithIndex(TypespaceTreeNode *root, uint32_t numberOfTypes, ui
             }
         }
     }
-    
+
     return NULL;
 }
 

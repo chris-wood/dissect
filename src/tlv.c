@@ -33,6 +33,39 @@ tlv_Display(TLV *tlv, size_t indentation)
     }
 }
 
+static void
+_tlv_ReportTree(TLV *tlv, Reporter *reporter, uint32_t numberOfTypes, uint16_t parentTypes[numberOfTypes])
+{
+    uint16_t *types = malloc(sizeof(numberOfTypes) * (numberOfTypes + 1));
+    if (numberOfTypes > 0) {
+        for (int i = 0; i < numberOfTypes; i++) {
+            types[i] = parentTypes[i];
+        }
+    }
+
+    types[numberOfTypes] = tlv_Type(tlv);
+    Buffer *value = tlv_ValueBuffer(tlv);
+
+    reporter_ReportTLV(reporter, numberOfTypes + 1, types, value);
+
+    for (size_t i = 0; i < tlv_GetNumberOfChildren(tlv); i++) {
+        TLV *child = tlv_GetChildByIndex(tlv, i);
+        _tlv_ReportTree(child, reporter, numberOfTypes + 1, types);
+    }
+
+    if (tlv_GetSibling(tlv) != NULL) {
+        _tlv_ReportTree(tlv_GetSibling(tlv), reporter, numberOfTypes, parentTypes);
+    }
+
+    free(types);
+}
+
+void
+tlv_Report(TLV *tlv, Reporter *reporter)
+{
+    _tlv_ReportTree(tlv, reporter, 0, NULL);
+}
+
 static bool
 _tlv_HasInnerTLV(TLV *tlv, uint32_t limit)
 {
@@ -71,24 +104,29 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint
         tlv->children = (TLV **) malloc(sizeof(TLV *));
         tlv->numberOfChildren = 0;
 
-        while (offset < length) {
+        while (offset < (tlv->offset + length)) {
             uint16_t inner_type = buffer_GetWordAtOffset(packet, offset);
-            uint16_t inner_length = buffer_GetWordAtOffset(packet, offset + 2);
+            offset += 2;
+            uint16_t inner_length = buffer_GetWordAtOffset(packet, offset);
+            offset += 2;
 
             if (offset + inner_length > limit) {
                 // Failure.
                 tlv->numberOfChildren = 0;
+                if (tlv->children != NULL) {
+                    free(tlv->children);
+                }
                 tlv->children = NULL;
                 return tlv;
             } else {
                 tlv->numberOfChildren++;
                 tlv->children = (TLV **) realloc(tlv->children, tlv->numberOfChildren * sizeof(TLV *));
 
-                TLV *child = tlv_Create(packet, inner_type, inner_length, offset + 4, limit);
+                TLV *child = tlv_Create(packet, inner_type, inner_length, offset, limit);
                 tlv->children[tlv->numberOfChildren - 1] = child;
             }
 
-            offset += 4 + inner_length;
+            offset += inner_length;
         }
     } else {
         tlv->children = NULL;
@@ -114,6 +152,12 @@ BufferOverlay *
 tlv_Value(TLV *tlv)
 {
     return tlv->value;
+}
+
+Buffer *
+tlv_ValueBuffer(TLV *tlv)
+{
+    return bufferOverlay_CreateBuffer(tlv->value);
 }
 
 size_t

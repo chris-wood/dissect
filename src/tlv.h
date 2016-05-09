@@ -3,6 +3,7 @@
 
 #include "buffer.h"
 #include "util.h"
+#include "reporter.h"
 
 struct tlv;
 typedef struct tlv TLV;
@@ -16,6 +17,7 @@ uint16_t tlv_Type(TLV *tlv);
 uint16_t tlv_Length(TLV *tlv);
 
 BufferOverlay *tlv_Value(TLV *tlv);
+Buffer *tlv_ValueBuffer(TLV *tlv);
 
 TLV *tlv_GetSibling(TLV *tlv);
 
@@ -27,5 +29,7 @@ TLV *tlv_GetChildByIndex(TLV *tlv, size_t index);
 size_t tlv_AbsoluteOffset(TLV *tlv);
 
 size_t tlv_AbsoluteLength(TLV *tlv);
+
+void tlv_Report(TLV *tlv, Reporter *reporter);
 
 #endif // tlv_h_

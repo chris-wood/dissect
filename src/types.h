@@ -43,6 +43,11 @@ typedef enum rta_tlv_schema_v1_ccnxmessage_types {
     CCNxTypespace_CCNxMessage_EndChunkNumber = 0x0019,
 } CCNxTypespace_CCNxMessage;
 
+typedef enum rta_tlv_schema_v1_ccnxname_types {
+    CCNxTypespace_CCNxName_NameSegment = 0x0001,
+    CCNxTypespace_CCNxName_PayloadID = 0x0002,
+} CCNxTypespace_CCNxName;
+
 typedef enum rta_tlv_schema_v1_ccnxmanifest_hashgroup_types {
     CCNxTypespace_CCNxManifestHashGroup_Metadata = 0x0001,
     CCNxTypespace_CCNxManifestHashGroup_DataPointer = 0x0002,
@@ -111,7 +116,7 @@ static char *top_level_type_strings[6] = {
     "CCNxTypespace_MessageType_Control"
 };
 
-static uint16_t message_types[8] = {
+static uint16_t message_types[7] = {
     CCNxTypespace_CCNxMessage_Name,
     CCNxTypespace_CCNxMessage_Payload,
     CCNxTypespace_CCNxMessage_KeyIdRestriction,
@@ -129,6 +134,16 @@ static char *message_type_strings[8] = {
     "CCNxTypespace_CCNxMessage_PayloadType",
     "CCNxTypespace_CCNxMessage_ExpiryTime",
     "CCNxTypespace_CCNxMessage_EndChunkNumber"
+};
+
+static uint16_t name_types[2] = {
+    CCNxTypespace_CCNxName_NameSegment,
+    CCNxTypespace_CCNxName_PayloadID,
+};
+
+static char *name_type_strings[8] = {
+    "CCNxTypespace_CCNxName_NameSegment",
+    "CCNxTypespace_CCNxName_PayloadID",
 };
 
 static uint16_t validation_alg_types[9] = {
@@ -171,25 +186,37 @@ typedef struct typespace_tree_node {
 static TypespaceTreeNode header_root = {
     .types = header_types,
     .typeStrings = NULL,
-    .numTypes = sizeof(header_types),
+    .numTypes = sizeof(header_types) / sizeof(uint16_t),
     .children = NULL,
     .numChildren = 0
 };
 
 static TypespaceTreeNode validation_alg_types_node = {
-    .types = top_level_types,
+    .types = validation_alg_types,
     .typeStrings = validation_alg_type_strings,
-    .numTypes = sizeof(top_level_types),
+    .numTypes = sizeof(validation_alg_types) / sizeof(uint16_t),
     .children = NULL,
     .numChildren = 0
+};
+
+static TypespaceTreeNode name_types_node = {
+    .types = name_types,
+    .typeStrings = name_type_strings,
+    .numTypes = sizeof(name_types) / sizeof(uint16_t),
+    .children = NULL,
+    .numChildren = 0
+};
+
+static TypespaceTreeNode *message_type_children[1] = {
+    &name_types_node,
 };
 
 static TypespaceTreeNode message_types_node = {
     .types = message_types,
     .typeStrings = message_type_strings,
-    .numTypes = sizeof(message_types),
-    .children = NULL,
-    .numChildren = 0
+    .numTypes = sizeof(message_types) / sizeof(uint16_t),
+    .children = message_type_children,
+    .numChildren = sizeof(message_type_children) / sizeof(TypespaceTreeNode *)
 };
 
 static TypespaceTreeNode *top_level_type_children[2] = {
@@ -200,9 +227,9 @@ static TypespaceTreeNode *top_level_type_children[2] = {
 static TypespaceTreeNode top_level_types_node = {
     .types = top_level_types,
     .typeStrings = top_level_type_strings,
-    .numTypes = sizeof(top_level_types),
+    .numTypes = sizeof(top_level_types) / sizeof(uint16_t),
     .children = top_level_type_children,
-    .numChildren = sizeof(top_level_type_children)
+    .numChildren = sizeof(top_level_type_children) / sizeof(TypespaceTreeNode *)
 };
 
 char *types_TreeToString(uint32_t numberOfTypes, uint16_t type[numberOfTypes]);

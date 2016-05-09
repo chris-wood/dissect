@@ -155,14 +155,10 @@ packet_Report(Packet *packet, Reporter *reporter)
     if (reporter_IsRaw(reporter)) {
         packet_Display(packet, reporter_GetFileDescriptor(reporter), 0);
     } else {
-
-        // TODO this is just an example. I need a function to walk the entire TLV tree and call this at every node.
-        TLV *tlv = packet->startTLV;
-
-        uint16_t types[1] = {tlv_Type(tlv)};
-        Buffer *value = bufferOverlay_CreateBuffer(tlv_Value(tlv));
-        reporter_ReportTLV(reporter, 1, types, value);
+        tlv_Report(packet->startTLV, reporter);
     }
+
+    tlv_Report(packet->startTLV, reporter);
 
     // printf("\n\n\n");
     // TLV *tlv = packet->startTLV;

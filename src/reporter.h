@@ -8,6 +8,7 @@ struct reporter;
 typedef struct reporter Reporter;
 
 Reporter *reporter_CreateRawFileReporter(FILE *fd);
+Reporter *reporter_CreateJSONFileReporter(FILE *fd);
 
 bool reporter_IsRaw(Reporter *reporter);
 FILE *reporter_GetFileDescriptor(Reporter *reporter);

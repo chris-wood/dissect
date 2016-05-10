@@ -92,7 +92,8 @@ main(int argc, char **argv)
         exit(0);
     }
 
-    Reporter *reporter = reporter_CreateRawFileReporter(stdout);
+    // Reporter *reporter = reporter_CreateRawFileReporter(stdout);
+    Reporter *reporter = reporter_CreateJSONFileReporter(stdout);
 
     // The buffer to store a single packet at a time (64KB is the max packet size).
     if (liveMode) {

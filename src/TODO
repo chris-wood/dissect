@@ -1,3 +1,3 @@
-2. packet_Display magic numbers and cleanup
-3. implement the JSON reporter
-4. define API/options for specifying filter fields (maybe in a file?)
+1. implement the JSON reporter //  clean this up.
+2. type string to type tree code (in types.c): /interest/name => type tree
+3. define API/options for specifying filter fields (maybe in a file?)

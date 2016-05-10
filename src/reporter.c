@@ -5,11 +5,17 @@
 #include "buffer.h"
 #include "reporter.h"
 #include "types.h"
+#include "cJSON.h"
 
 typedef struct {
     FILE *fp;
     size_t numPackets;
 } _FileReporterContext;
+
+typedef struct {
+    _FileReporterContext *fileContext;
+    cJSON *currentPacket;
+} _JSONReporterContext;
 
 struct reporter {
     void (*start)(void *);
@@ -26,7 +32,13 @@ _fileReporter_GetFileDescriptor(_FileReporterContext *context)
     return context->fp;
 }
 
-void
+FILE *
+_jsonReporter_GetFileDescriptor(_JSONReporterContext *context)
+{
+    return context->fileContext->fp;
+}
+
+static void
 _fileReporter_Report(_FileReporterContext *context, uint32_t numberOfTypes, uint16_t type[numberOfTypes], Buffer *buffer)
 {
     for (uint32_t i = 0; i < numberOfTypes; i++) {
@@ -47,16 +59,64 @@ _fileReporter_Report(_FileReporterContext *context, uint32_t numberOfTypes, uint
     fprintf(context->fp, "\n");
 }
 
-void
+static void
 _fileReporter_Start(_FileReporterContext *context)
 {
     fprintf(context->fp, "#### PACKET %zu\n", context->numPackets);
 }
 
-void
+static void
 _fileReporter_End(_FileReporterContext *context)
 {
     fprintf(context->fp, "\n");
+}
+
+static void
+_jsonReporter_Report(_JSONReporterContext *context, uint32_t numberOfTypes, uint16_t type[numberOfTypes], Buffer *buffer)
+{
+    cJSON *root = context->currentPacket;
+
+    for (int i = 1; i <= numberOfTypes; i++) {
+        char *key = types_TreeToString(i, type);
+        cJSON *item = cJSON_GetObjectItem(root, key);
+
+        if (item != NULL) { // recurse into the tree
+            if (i == numberOfTypes) {
+                char *bufferString = buffer_ToString(buffer);
+                cJSON_AddStringToObject(item, key, bufferString);
+                free(bufferString); // we're done here.
+            }
+            root = item;
+        } else { // create a new node in the tree
+            cJSON *newItem = cJSON_CreateObject();
+
+            if (i == numberOfTypes) {
+                char *bufferString = buffer_ToString(buffer);
+                // cJSON *bufferEntry = cJSON_CreateString(bufferString);
+                // cJSON_AddItemToObject(newItem, key, bufferEntry);
+                cJSON_AddStringToObject(newItem, key, bufferString);
+                free(bufferString); // we're done here.
+            }
+
+            cJSON_AddItemToObject(root, key, newItem);
+            root = newItem;
+        }
+    }
+}
+
+static void
+_jsonReporter_Start(_JSONReporterContext *context)
+{
+    context->currentPacket = cJSON_CreateObject(); // empty to start
+}
+
+static void
+_jsonReporter_End(_JSONReporterContext *context)
+{
+    char *packetString = cJSON_Print(context->currentPacket);
+    fprintf(context->fileContext->fp, "%s\n", packetString);
+    free(packetString);
+    cJSON_Delete(context->currentPacket);
 }
 
 // TODO: need to write destructor functions
@@ -77,6 +137,29 @@ reporter_CreateRawFileReporter(FILE *fd)
     _FileReporterContext *context = malloc(sizeof(_FileReporterContext));
     context->fp = fd;
     context->numPackets = 0;
+    reporter->context = context;
+
+    return reporter;
+}
+
+Reporter *
+reporter_CreateJSONFileReporter(FILE *fd)
+{
+    Reporter *reporter = malloc(sizeof(Reporter));
+    reporter->reportFunction = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _jsonReporter_Report;
+    reporter->start = (void (*)(void *)) _jsonReporter_Start;
+    reporter->end = (void (*)(void *)) _jsonReporter_End;
+    reporter->getFileDescriptor = (FILE *(*)(void *)) _jsonReporter_GetFileDescriptor;
+    reporter->hasFilter = false;
+
+    _JSONReporterContext *context = malloc(sizeof(_JSONReporterContext));
+    context->currentPacket = NULL;
+
+    _FileReporterContext *fileContext = malloc(sizeof(_FileReporterContext));
+    fileContext->fp = fd;
+    fileContext->numPackets = 0;
+    context->fileContext = fileContext;
+
     reporter->context = context;
 
     return reporter;

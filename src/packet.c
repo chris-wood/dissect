@@ -158,16 +158,6 @@ packet_Report(Packet *packet, Reporter *reporter)
 
     tlv_Report(packet->startTLV, reporter);
 
-    // printf("\n\n\n");
-    // TLV *tlv = packet->startTLV;
-    // while (tlv_GetNumberOfChildren(tlv) > 0) {
-    //     tlv = tlv_GetChildByIndex(tlv, 0);
-    // }
-    //
-    // uint16_t types[1] = {tlv_Type(tlv)};
-    // Buffer *value = bufferOverlay_CreateBuffer(tlv_Value(tlv));
-    // reporter_ReportTLV(reporter, 1, types, value);
-
     reporter_EndPacket(reporter);
 }
 

@@ -177,24 +177,17 @@ typedef struct typespace_tree_node {
     uint16_t *types;
     char **typeStrings;
     uint16_t numTypes;
+    bool isLeaf;
 
     struct typespace_tree_node **children;
     uint16_t numChildren;
 } TypespaceTreeNode;
 
-// TODO: remove the header part... it's not in the rest of the TLV tree space
-static TypespaceTreeNode header_root = {
-    .types = header_types,
-    .typeStrings = NULL,
-    .numTypes = sizeof(header_types) / sizeof(uint16_t),
-    .children = NULL,
-    .numChildren = 0
-};
-
 static TypespaceTreeNode validation_alg_types_node = {
     .types = validation_alg_types,
     .typeStrings = validation_alg_type_strings,
     .numTypes = sizeof(validation_alg_types) / sizeof(uint16_t),
+    .isLeaf = true,
     .children = NULL,
     .numChildren = 0
 };
@@ -203,6 +196,7 @@ static TypespaceTreeNode name_types_node = {
     .types = name_types,
     .typeStrings = name_type_strings,
     .numTypes = sizeof(name_types) / sizeof(uint16_t),
+    .isLeaf = true,
     .children = NULL,
     .numChildren = 0
 };
@@ -215,6 +209,7 @@ static TypespaceTreeNode message_types_node = {
     .types = message_types,
     .typeStrings = message_type_strings,
     .numTypes = sizeof(message_types) / sizeof(uint16_t),
+    .isLeaf = false,
     .children = message_type_children,
     .numChildren = sizeof(message_type_children) / sizeof(TypespaceTreeNode *)
 };
@@ -228,10 +223,12 @@ static TypespaceTreeNode top_level_types_node = {
     .types = top_level_types,
     .typeStrings = top_level_type_strings,
     .numTypes = sizeof(top_level_types) / sizeof(uint16_t),
+    .isLeaf = false,
     .children = top_level_type_children,
     .numChildren = sizeof(top_level_type_children) / sizeof(TypespaceTreeNode *)
 };
 
 char *types_TreeToString(uint32_t numberOfTypes, uint16_t type[numberOfTypes]);
+bool types_IsLeaf(uint32_t numberOfTypes, uint16_t type[numberOfTypes]);
 
 #endif

@@ -83,21 +83,24 @@ _jsonReporter_Report(_JSONReporterContext *context, uint32_t numberOfTypes, uint
         if (item != NULL) { // recurse into the tree
             if (i == numberOfTypes) {
                 char *bufferString = buffer_ToString(buffer);
-                cJSON_AddStringToObject(item, key, bufferString);
+                // cJSON_AddStringToObject(item, key, bufferString);
                 free(bufferString); // we're done here.
             }
+
             root = item;
         } else { // create a new node in the tree
             cJSON *newItem = cJSON_CreateObject();
 
             if (i == numberOfTypes) {
                 char *bufferString = buffer_ToString(buffer);
-                cJSON_AddStringToObject(newItem, key, bufferString);
+                // cJSON_AddStringToObject(newItem, key, bufferString);
                 free(bufferString); // we're done here.
             }
 
             cJSON_AddItemToObject(root, key, newItem);
             root = newItem;
+
+            printf("%s\n", cJSON_Print(context->currentPacket));
         }
     }
 }

@@ -92,8 +92,6 @@ _jsonReporter_Report(_JSONReporterContext *context, uint32_t numberOfTypes, uint
 
             if (i == numberOfTypes) {
                 char *bufferString = buffer_ToString(buffer);
-                // cJSON *bufferEntry = cJSON_CreateString(bufferString);
-                // cJSON_AddItemToObject(newItem, key, bufferEntry);
                 cJSON_AddStringToObject(newItem, key, bufferString);
                 free(bufferString); // we're done here.
             }
@@ -107,7 +105,7 @@ _jsonReporter_Report(_JSONReporterContext *context, uint32_t numberOfTypes, uint
 static void
 _jsonReporter_Start(_JSONReporterContext *context)
 {
-    context->currentPacket = cJSON_CreateObject(); // empty to start
+    context->currentPacket = cJSON_CreateObject();
 }
 
 static void
@@ -121,8 +119,8 @@ _jsonReporter_End(_JSONReporterContext *context)
 
 // TODO: need to write destructor functions
 
-// TODO: JSON reporter just writes nested JSON with the value at the end
-// TODO: CSV repoter writes a single header out to the file (based on filter) and then, for each packet, collects the list of buffers to write and then writes it out when "finalized"
+// TODO: CSV repoter writes a single header out to the file (based on filter) and then,
+//   for each packet, collects the list of buffers to write and then writes it out when "finalized"
 
 Reporter *
 reporter_CreateRawFileReporter(FILE *fd)

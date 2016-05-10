@@ -176,6 +176,33 @@ src/buffer.c.s:
 	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/buffer.c.s
 .PHONY : src/buffer.c.s
 
+src/cJSON.o: src/cJSON.c.o
+
+.PHONY : src/cJSON.o
+
+# target to build an object file
+src/cJSON.c.o:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/cJSON.c.o
+.PHONY : src/cJSON.c.o
+
+src/cJSON.i: src/cJSON.c.i
+
+.PHONY : src/cJSON.i
+
+# target to preprocess a source file
+src/cJSON.c.i:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/cJSON.c.i
+.PHONY : src/cJSON.c.i
+
+src/cJSON.s: src/cJSON.c.s
+
+.PHONY : src/cJSON.s
+
+# target to generate assembly for a file
+src/cJSON.c.s:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/cJSON.c.s
+.PHONY : src/cJSON.c.s
+
 src/capture.o: src/capture.c.o
 
 .PHONY : src/capture.o
@@ -338,6 +365,33 @@ src/tlv.c.s:
 	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/tlv.c.s
 .PHONY : src/tlv.c.s
 
+src/types.o: src/types.c.o
+
+.PHONY : src/types.o
+
+# target to build an object file
+src/types.c.o:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/types.c.o
+.PHONY : src/types.c.o
+
+src/types.i: src/types.c.i
+
+.PHONY : src/types.i
+
+# target to preprocess a source file
+src/types.c.i:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/types.c.i
+.PHONY : src/types.c.i
+
+src/types.s: src/types.c.s
+
+.PHONY : src/types.s
+
+# target to generate assembly for a file
+src/types.c.s:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/types.c.s
+.PHONY : src/types.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -352,6 +406,9 @@ help:
 	@echo "... src/buffer.o"
 	@echo "... src/buffer.i"
 	@echo "... src/buffer.s"
+	@echo "... src/cJSON.o"
+	@echo "... src/cJSON.i"
+	@echo "... src/cJSON.s"
 	@echo "... src/capture.o"
 	@echo "... src/capture.i"
 	@echo "... src/capture.s"
@@ -370,6 +427,9 @@ help:
 	@echo "... src/tlv.o"
 	@echo "... src/tlv.i"
 	@echo "... src/tlv.s"
+	@echo "... src/types.o"
+	@echo "... src/types.i"
+	@echo "... src/types.s"
 .PHONY : help
 
 

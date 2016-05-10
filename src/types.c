@@ -24,7 +24,7 @@ _types_TreeToStringWithIndex(TypespaceTreeNode *root, uint32_t numberOfTypes, ui
 static bool
 _types_IsLeaf(TypespaceTreeNode *root, uint32_t numberOfTypes, uint16_t type[numberOfTypes], uint32_t index)
 {
-    bool result = true;
+    bool result = false;
 
     for (size_t i = 0; i < root->numTypes; i++) {
         if (type[index] == root->types[i]) {

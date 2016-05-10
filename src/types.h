@@ -209,7 +209,7 @@ static TypespaceTreeNode message_types_node = {
     .types = message_types,
     .typeStrings = message_type_strings,
     .numTypes = sizeof(message_types) / sizeof(uint16_t),
-    .isLeaf = false,
+    .isLeaf = true,
     .children = message_type_children,
     .numChildren = sizeof(message_type_children) / sizeof(TypespaceTreeNode *)
 };

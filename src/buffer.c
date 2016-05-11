@@ -9,6 +9,7 @@ struct buffer {
 struct buffer_overlay {
     uint8_t *bytes;
     uint32_t length;
+    uint32_t offset;
 };
 
 BufferOverlay *
@@ -16,8 +17,14 @@ bufferOverlay_CreateFromBuffer(Buffer *b, uint32_t offset, uint32_t length)
 {
     BufferOverlay *overlay = (BufferOverlay *) malloc(sizeof(BufferOverlay));
 
-    overlay->bytes = b->bytes + offset;
     overlay->length = length;
+    overlay->bytes = b->bytes + offset;
+
+    // overlay->bytes = malloc(length); //&(b->bytes[offset]);
+    // for (int i = 0; i < length; i++) {
+    //     overlay->bytes[i] = b->bytes[i + offset];
+    // }
+    // // overlay->offset = offset;
 
     return overlay;
 }
@@ -44,7 +51,7 @@ bufferOverlay_Length(BufferOverlay *overlay)
 uint16_t
 bufferOverlay_GetWordAtOffset(BufferOverlay *b, uint32_t offset)
 {
-    uint16_t word = ((uint16_t)(b->bytes[offset]) << 8) | (uint16_t)(b->bytes[offset + 1]);
+    uint16_t word = (((uint16_t)(b->bytes[offset]) << 8) & 0xFF00) | ((uint16_t)(b->bytes[offset + 1]) & 0x00FF);
     return word;
 }
 
@@ -192,7 +199,8 @@ buffer_GetUint16(Buffer *buffer, size_t offset)
 uint8_t
 buffer_GetUint8(Buffer *buffer, size_t offset)
 {
-    return 0;
+    uint16_t value = buffer->bytes[offset];
+    return value;
 }
 
 // TODO: move this redundant code to a single function

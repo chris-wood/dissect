@@ -60,21 +60,17 @@ captureFromFile(Reporter *reporter, FILE *file)
 {
     // The buffer to store a single packet at a time (64KB is the max packet size).
     char buffer[BUFFER_SIZE];
-    size_t offset = 0;
+    memset(buffer, 0, BUFFER_SIZE);
 
-    bool isMore = fgets(buffer, BUFFER_SIZE, file) != NULL;
-    size_t bufferSize = BUFFER_SIZE;
-    size_t tail = bufferSize;
-    size_t packetNumber = 0;
-
-    // Start reading from the command line
+    // Start peeking into the file and read the packet if there's something there
+    bool isMore = fgets(buffer, 5, file) != NULL;
     while (isMore) {
         // Peek at length and fill in the tail of the buffer if necessary
-        uint16_t length = ((uint16_t)(buffer[2]) << 8) | (uint16_t)(buffer[3]);
-        if (length == 0) {
-            break;
-        } else if (length > tail) {
-            fgets(buffer + tail, BUFFER_SIZE - tail, file);
+        uint16_t length = (((uint16_t)(buffer[2]) << 8) & 0xFF00) | ((uint16_t)(buffer[3]) & 0x00FF);
+        if (length > 0) {
+            isMore = fgets(((char *) buffer) + 4, length - 4 + 1, file) != NULL;
+        } else {
+            isMore = false;
         }
 
         // Create the packet
@@ -84,10 +80,11 @@ captureFromFile(Reporter *reporter, FILE *file)
         // Display the packet
         packet_Report(packet, reporter);
 
-        // Update the offset and shift down the rest of the buffer contents
-        memcpy(buffer, buffer + length, bufferSize - length);
-        memset(buffer + tail, 0, bufferSize - tail);
-        tail = BUFFER_SIZE - length;
+        // Reset the buffer and try to read in the next packet
+        memset(buffer, 0, BUFFER_SIZE);
+        if (isMore) {
+            isMore = fgets(buffer, 5, file) != NULL;
+        }
     }
 
     return 0;

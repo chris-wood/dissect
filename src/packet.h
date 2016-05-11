@@ -14,8 +14,8 @@ struct packet;
 typedef struct packet Packet;
 
 typedef enum {
-    PacketVersion_V0,
-    PacketVersion_V1,
+    PacketVersion_V0 = 0x00,
+    PacketVersion_V1 = 0x01,
     PacketVersion_Invalid
 } PacketVersion;
 
@@ -77,8 +77,8 @@ void packet_Report(Packet *packet, Reporter *reporter);
 Buffer *packet_GetFieldValue(Packet *packet, PacketField field);
 
 // TLV iterator and query functions
-TLV *packet_GetNextTLV(Packet *packet, uint32_t offset, uint32_t length);
-bool packet_HasNextTLV(Packet *packet, uint32_t offset);
+TLV *packet_GetNextTLV(Packet *packet, uint16_t offset, uint16_t length);
+bool packet_HasNextTLV(Packet *packet, uint16_t offset);
 //TLV *packet_FindTLV(TLV *tlv, uint16_t type);
 TLV *packet_FindNestedTLV(Packet *packet, uint32_t numberOfTypes, uint16_t type[numberOfTypes]);
 

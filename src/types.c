@@ -52,3 +52,43 @@ types_IsLeaf(uint32_t numberOfTypes, uint16_t type[numberOfTypes])
 {
     return _types_IsLeaf(&top_level_types_node, numberOfTypes, type, 0);
 }
+
+void
+types_ParseStringTree(char *treeString, uint32_t *numberOfTypes, uint16_t **type)
+{
+    TypespaceTreeNode *root = &top_level_types_node;
+
+    uint32_t numTypes = 0;
+    char *token = strtok(treeString, " ");
+
+    // TODO: we should assert this to be true
+    *type = NULL;
+
+    while (token) {
+        bool match = false;
+        for (int i = 0; i < root->numTypes; i++) {
+            if (strcmp(token, root->typeStrings[i]) == 0) {
+                numTypes++;
+                if (*type == NULL) {
+                    *type = malloc(numTypes * sizeof(**type));
+                } else {
+                    *type = realloc(*type, numTypes * sizeof(**type));
+                }
+                *type[numTypes - 1] = root->types[i];
+
+                match = true;
+            }
+        }
+        if (!match) {
+            if (*type != NULL) {
+                free(*type);
+                *type = NULL;
+            }
+            *numberOfTypes = 0;
+            return;
+        }
+
+        // Continue down the tree.
+        token = strtok(NULL, " ");
+    }
+}

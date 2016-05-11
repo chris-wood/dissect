@@ -47,6 +47,7 @@ _tlv_ReportTree(TLV *tlv, Reporter *reporter, uint32_t numberOfTypes, uint16_t p
     Buffer *value = tlv_ValueBuffer(tlv);
 
     reporter_ReportTLV(reporter, numberOfTypes + 1, types, value);
+    // buffer_Destroy(&value);
 
     for (size_t i = 0; i < tlv_GetNumberOfChildren(tlv); i++) {
         TLV *child = tlv_GetChildByIndex(tlv, i);
@@ -101,7 +102,7 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint
 
     if (_tlv_HasInnerTLV(tlv, length)) {
         // Attempt to create an array of children. Rewind and fail if something goes wrong.
-        tlv->children = (TLV **) malloc(sizeof(TLV *));
+        tlv->children = NULL;
         tlv->numberOfChildren = 0;
 
         while (offset < (tlv->offset + length)) {

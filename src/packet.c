@@ -33,26 +33,29 @@ typedef struct {
 } _InterestReturnHeader;
 
 struct packet {
-    Buffer *packet;
-    TLV *startTLV;
-
     _FixedHeader header;
+
     union {
         _InterestHeader interestHeader;
         _ContentObjectHeader contentObjectHeader;
         _InterestReturnHeader interestReturnHeader;
     };
+    TLV *startTLV;
+
+    Buffer *packet;
 };
 
 // TLV iterator functions
 TLV *
-packet_GetNextTLV(Packet *packet, uint32_t offset, uint32_t limit)
+packet_GetNextTLV(Packet *packet, uint16_t offset, uint16_t limit)
 {
     uint16_t type = buffer_GetWordAtOffset(packet->packet, offset);
     offset += 2;
 
     uint16_t length = buffer_GetWordAtOffset(packet->packet, offset);
     offset += 2;
+
+    printf(">>> %d\n", packet->header.packetLength);
 
     TLV *tlv  = tlv_Create(packet->packet, type, length, offset, limit);
 
@@ -98,10 +101,10 @@ _packet_DisplayBody(TLV *root, FILE *fp, int indentation)
             _packet_DisplayBody(child, fp, indentation + 2);
         }
     } else {
-        int inner_offset = 0; // the TLV value is a relative buffer overlay, so we need to use a TLV-specific offset when walking over its values
+        uint16_t inner_offset = 0; // the TLV value is a relative buffer overlay, so we need to use a TLV-specific offset when walking over its values
         while (length > 0) {
             int width = 0;
-            fprintf(fp, "%04x  ", offset);
+            fprintf(fp, "%04x  ", offset + inner_offset);
             width += 6;
             for (int i = 0; i < indentation + 2; i++) {
                 fprintf(fp, " ");
@@ -128,6 +131,8 @@ _packet_DisplayBody(TLV *root, FILE *fp, int indentation)
                 inner_offset++;
             }
             fprintf(fp, " |\n");
+
+            printf("length = %d\n", length);
         }
     }
 
@@ -165,8 +170,12 @@ static void
 _packet_ExtractHeader(Packet *packet)
 {
     Buffer *buffer = packet->packet;
+
     packet->header.version = buffer_GetUint8(buffer, 0);
     packet->header.packetType = buffer_GetUint8(buffer, 1);
+
+    printf("%d %d\n", packet->header.version, packet->header.packetType);
+
     packet->header.packetLength = buffer_GetUint16(buffer, 2);
     packet->header.headerLength = buffer_GetUint8(buffer, 7);
 
@@ -193,14 +202,14 @@ _packet_ExtractHeader(Packet *packet)
 Packet *
 packet_CreateFromBuffer(Buffer *buffer)
 {
-    Packet *packet = (Packet *) malloc(sizeof(packet));
+    Packet *packet = (Packet *) malloc(sizeof(Packet));
     packet->packet = buffer;
 
     // Populate fixed header information
     _packet_ExtractHeader(packet);
 
     // Create the *tree* of TLVs
-    uint32_t offset = 8; // skip past the fixed header
+    uint16_t offset = 8; // skip past the fixed header
     packet->startTLV = packet_GetNextTLV(packet, offset, buffer_Size(buffer));
     TLV *prev = packet->startTLV;
 

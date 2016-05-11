@@ -230,5 +230,6 @@ static TypespaceTreeNode top_level_types_node = {
 
 char *types_TreeToString(uint32_t numberOfTypes, uint16_t type[numberOfTypes]);
 bool types_IsLeaf(uint32_t numberOfTypes, uint16_t type[numberOfTypes]);
+void types_ParseStringTree(char *treeString, uint32_t *numberOfTypes, uint16_t **type);
 
 #endif

@@ -17,6 +17,7 @@ typedef struct buffer_overlay BufferOverlay;
 
 BufferOverlay *bufferOverlay_CreateFromBuffer(Buffer *b, uint32_t offset, uint32_t length);
 Buffer *bufferOverlay_CreateBuffer(BufferOverlay *overlay);
+void bufferOverlay_Destroy(BufferOverlay **bufferOverlayPtr);
 
 uint8_t *bufferOverlay_Overlay(BufferOverlay *overlay);
 uint32_t bufferOverlay_Length(BufferOverlay *overlay);
@@ -32,8 +33,10 @@ uint16_t bufferOverlay_GetWordAtOffset(BufferOverlay *b, uint32_t offset);
 void buffer_Display(Buffer *b, int indentation);
 char *buffer_ToString(Buffer *b);
 void buffer_DisplayHex(Buffer *b, int indentation);
+
 Buffer *buffer_CreateEmpty();
 Buffer *buffer_CreateFromArray(uint8_t *bytes, size_t length);
+void buffer_Destroy(Buffer **bufferPtr);
 Buffer *buffer_Copy(Buffer *copy);
 int buffer_Compare(Buffer *this, Buffer *other);
 

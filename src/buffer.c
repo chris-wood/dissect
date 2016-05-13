@@ -29,6 +29,14 @@ bufferOverlay_CreateFromBuffer(Buffer *b, uint32_t offset, uint32_t length)
     return overlay;
 }
 
+void
+bufferOverlay_Destroy(BufferOverlay **bufferOverlayPtr)
+{
+    BufferOverlay *overlay = *bufferOverlayPtr;
+    free(overlay);
+    *bufferOverlayPtr = NULL;
+}
+
 Buffer *
 bufferOverlay_CreateBuffer(BufferOverlay *overlay)
 {
@@ -114,6 +122,15 @@ buffer_DisplayHex(Buffer *b, int indentation)
         printf("%c", b->bytes[i]);
     }
     printf("\n");
+}
+
+void
+buffer_Destroy(Buffer **bufferPtr)
+{
+    Buffer *buffer = *bufferPtr;
+    free(buffer->bytes);
+    free(buffer);
+    *bufferPtr = NULL;
 }
 
 Buffer *

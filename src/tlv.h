@@ -9,6 +9,7 @@ struct tlv;
 typedef struct tlv TLV;
 
 TLV *tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint32_t limit);
+void tlv_Destroy(TLV **tlvPtr);
 
 void tlv_Display(TLV *tlv, size_t indentation);
 

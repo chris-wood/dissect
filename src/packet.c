@@ -55,8 +55,6 @@ packet_GetNextTLV(Packet *packet, uint16_t offset, uint16_t limit)
     uint16_t length = buffer_GetWordAtOffset(packet->packet, offset);
     offset += 2;
 
-    printf(">>> %d\n", packet->header.packetLength);
-
     TLV *tlv  = tlv_Create(packet->packet, type, length, offset, limit);
 
     return tlv;
@@ -131,8 +129,6 @@ _packet_DisplayBody(TLV *root, FILE *fp, int indentation)
                 inner_offset++;
             }
             fprintf(fp, " |\n");
-
-            printf("length = %d\n", length);
         }
     }
 
@@ -220,6 +216,21 @@ packet_CreateFromBuffer(Buffer *buffer)
     }
 
     return packet;
+}
+
+void
+packet_Destroy(Packet **packetPtr)
+{
+    Packet *packet = *packetPtr;
+    if (packet == NULL) {
+        return;
+    }
+
+    tlv_Destroy(&packet->startTLV);
+    buffer_Destroy(&packet->packet);
+
+    free(packet);
+    *packetPtr = NULL;
 }
 
 // general packet stuff

@@ -62,6 +62,7 @@ typedef enum {
 } PacketField;
 
 Packet *packet_CreateFromBuffer(Buffer *buffer);
+void packet_Destroy(Packet **packetPtr);
 
 // general packet stuff
 PacketVersion packet_GetVersion(Packet *packet);

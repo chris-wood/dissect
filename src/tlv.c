@@ -137,6 +137,23 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint
     return tlv;
 }
 
+void
+tlv_Destroy(TLV **tlvPtr)
+{
+    TLV *tlv = *tlvPtr;
+
+    bufferOverlay_Destroy(&tlv->value);
+    if (tlv->sibling != NULL) {
+        tlv_Destroy(&tlv->sibling);
+    }
+    for (size_t i = 0; i < tlv->numberOfChildren; i++) {
+        tlv_Destroy(&tlv->children[i]);
+    }
+
+    free(tlv);
+    *tlvPtr = NULL;
+}
+
 uint16_t
 tlv_Type(TLV *tlv)
 {

@@ -79,6 +79,8 @@ captureFromFile(Reporter *reporter, FILE *file)
 
         // Display the packet
         packet_Report(packet, reporter);
+        packet_Destroy(&packet);
+        buffer_Destroy(&packetBuffer);
 
         // Reset the buffer and try to read in the next packet
         memset(buffer, 0, BUFFER_SIZE);

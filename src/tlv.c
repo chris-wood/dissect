@@ -47,7 +47,7 @@ _tlv_ReportTree(TLV *tlv, Reporter *reporter, uint32_t numberOfTypes, uint16_t p
     Buffer *value = tlv_ValueBuffer(tlv);
 
     reporter_ReportTLV(reporter, numberOfTypes + 1, types, value);
-    // buffer_Destroy(&value);
+    buffer_Destroy(&value);
 
     for (size_t i = 0; i < tlv_GetNumberOfChildren(tlv); i++) {
         TLV *child = tlv_GetChildByIndex(tlv, i);

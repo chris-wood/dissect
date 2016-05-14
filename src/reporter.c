@@ -72,6 +72,15 @@ _fileReporter_End(_FileReporterContext *context)
 }
 
 static void
+_fileReporter_Destroy(_FileReporterContext **contextPtr)
+{
+    _FileReporterContext *reporter = *contextPtr;
+    fclose(reporter->fp);
+    free(reporter);
+    *contextPtr = NULL;
+}
+
+static void
 _jsonReporter_Report(_JSONReporterContext *context, uint32_t numberOfTypes, uint16_t type[numberOfTypes], Buffer *buffer)
 {
     cJSON *root = context->currentPacket;
@@ -122,6 +131,19 @@ _jsonReporter_End(_JSONReporterContext *context)
     fprintf(context->fileContext->fp, "%s\n", packetString);
     free(packetString);
     cJSON_Delete(context->currentPacket);
+    context->currentPacket = NULL;
+}
+
+static void
+_jsonReporter_Destroy(_JSONReporterContext **contextPtr)
+{
+    _JSONReporterContext *reporter = *contextPtr;
+    if (reporter->currentPacket != NULL) {
+        cJSON_Delete(reporter->currentPacket);
+    }
+    _fileReporter_Destroy(&reporter->fileContext);
+    free(reporter);
+    *contextPtr = NULL;
 }
 
 // TODO: need to write destructor functions

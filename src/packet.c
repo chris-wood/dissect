@@ -227,7 +227,8 @@ packet_Destroy(Packet **packetPtr)
     }
 
     tlv_Destroy(&packet->startTLV);
-    buffer_Destroy(&packet->packet);
+    // We don't own the bufer
+    // buffer_Destroy(&packet->packet);
 
     free(packet);
     *packetPtr = NULL;

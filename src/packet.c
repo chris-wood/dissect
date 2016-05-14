@@ -169,9 +169,6 @@ _packet_ExtractHeader(Packet *packet)
 
     packet->header.version = buffer_GetUint8(buffer, 0);
     packet->header.packetType = buffer_GetUint8(buffer, 1);
-
-    printf("%d %d\n", packet->header.version, packet->header.packetType);
-
     packet->header.packetLength = buffer_GetUint16(buffer, 2);
     packet->header.headerLength = buffer_GetUint8(buffer, 7);
 

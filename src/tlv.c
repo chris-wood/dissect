@@ -115,6 +115,9 @@ tlv_Create(Buffer *packet, uint16_t type, uint16_t length, uint32_t offset, uint
                 // Failure.
                 tlv->numberOfChildren = 0;
                 if (tlv->children != NULL) {
+                    for (int i = 0 ; i < tlv->numberOfChildren; i++) {
+                        tlv_Destroy(&(tlv->children[i]));
+                    }
                     free(tlv->children);
                 }
                 tlv->children = NULL;
@@ -148,6 +151,9 @@ tlv_Destroy(TLV **tlvPtr)
     }
     for (size_t i = 0; i < tlv->numberOfChildren; i++) {
         tlv_Destroy(&tlv->children[i]);
+    }
+    if (tlv->children != NULL) {
+        free(tlv->children);
     }
 
     free(tlv);

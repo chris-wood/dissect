@@ -21,6 +21,8 @@ struct reporter {
     void (*start)(void *);
     void (*end)(void *);
     void (*reportFunction)(void *, uint32_t , uint16_t *, Buffer *);
+    void (*destroy)(void **);
+
     FILE *(*getFileDescriptor)(void *);
     void *context; // sloppy
     bool hasFilter;
@@ -75,7 +77,6 @@ static void
 _fileReporter_Destroy(_FileReporterContext **contextPtr)
 {
     _FileReporterContext *reporter = *contextPtr;
-    fclose(reporter->fp);
     free(reporter);
     *contextPtr = NULL;
 }
@@ -158,6 +159,7 @@ reporter_CreateRawFileReporter(FILE *fd)
     reporter->reportFunction = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _fileReporter_Report;
     reporter->start = (void (*)(void *)) _fileReporter_Start;
     reporter->end = (void (*)(void *)) _fileReporter_End;
+    reporter->destroy = (void (*)(void **)) _fileReporter_Destroy;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _fileReporter_GetFileDescriptor;
     reporter->hasFilter = false;
 
@@ -176,6 +178,7 @@ reporter_CreateJSONFileReporter(FILE *fd)
     reporter->reportFunction = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _jsonReporter_Report;
     reporter->start = (void (*)(void *)) _jsonReporter_Start;
     reporter->end = (void (*)(void *)) _jsonReporter_End;
+    reporter->destroy = (void (*)(void **)) _jsonReporter_Destroy;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _jsonReporter_GetFileDescriptor;
     reporter->hasFilter = false;
 
@@ -190,6 +193,12 @@ reporter_CreateJSONFileReporter(FILE *fd)
     reporter->context = context;
 
     return reporter;
+}
+
+void
+reporter_Destroy(Reporter **reporterPtr)
+{
+
 }
 
 void

@@ -109,4 +109,6 @@ main(int argc, char **argv)
     } else {
         captureFromFile(reporter, stdin);
     }
+
+    reporter_Destroy(&reporter);
 }

@@ -51,7 +51,7 @@ _fileReporter_Report(_FileReporterContext *context, uint32_t numberOfTypes, uint
     if (typeString != NULL) {
         if (buffer != NULL) {
             char *bufferString = buffer_ToString(buffer);
-            fprintf(context->fp, "%s: %s\n", typeString, buffer_ToString(buffer));
+            fprintf(context->fp, "%s: %s\n", typeString, bufferString);
             free(bufferString);
         } else {
             fprintf(context->fp, "%s: \n", typeString);
@@ -147,8 +147,6 @@ _jsonReporter_Destroy(_JSONReporterContext **contextPtr)
     *contextPtr = NULL;
 }
 
-// TODO: need to write destructor functions
-
 // TODO: CSV repoter writes a single header out to the file (based on filter) and then,
 //   for each packet, collects the list of buffers to write and then writes it out when "finalized"
 
@@ -198,7 +196,12 @@ reporter_CreateJSONFileReporter(FILE *fd)
 void
 reporter_Destroy(Reporter **reporterPtr)
 {
+    Reporter *reporter = *reporterPtr;
 
+    reporter->destroy(&reporter->context);
+    free(reporter);
+
+    *reporterPtr = NULL;
 }
 
 void

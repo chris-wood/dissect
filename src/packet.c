@@ -157,8 +157,6 @@ packet_Report(Packet *packet, Reporter *reporter)
         tlv_Report(packet->startTLV, reporter);
     }
 
-    tlv_Report(packet->startTLV, reporter);
-
     reporter_EndPacket(reporter);
 }
 

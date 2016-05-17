@@ -15,6 +15,7 @@
 // - specify different output formats per packet (CSV, JSON, etc)
 
 typedef enum {
+    _OutputFormat_Raw,
     _OutputFormat_JSON,
     _OutputFormat_CSV,
     _OutputFormat_Invalid
@@ -46,7 +47,7 @@ main(int argc, char **argv)
     bool liveMode = false;
     bool fileMode = false;
 
-    _OutputFormat outputFormat = _OutputFormat_Invalid;
+    _OutputFormat outputFormat = _OutputFormat_Raw;
 
     static struct option longopts[] = {
         { "output",         required_argument, NULL, 'o' },
@@ -66,7 +67,7 @@ main(int argc, char **argv)
                 } else if (strcmp(cvalue, "csv") == 0) {
                     outputFormat = _OutputFormat_CSV;
                 } else {
-                    showUsage = true;
+                    outputFormat = _OutputFormat_Invalid;
                 }
                 break;
             case 'c':
@@ -92,8 +93,20 @@ main(int argc, char **argv)
         exit(0);
     }
 
-    // Reporter *reporter = reporter_CreateRawFileReporter(stdout);
-    Reporter *reporter = reporter_CreateJSONFileReporter(stdout);
+    Reporter *reporter = NULL;
+    switch (outputFormat) {
+        case _OutputFormat_Raw:
+            reporter = reporter_CreateRawFileReporter(stdout);
+            break;
+        case _OutputFormat_JSON:
+            reporter = reporter_CreateJSONFileReporter(stdout);
+            break;
+        case _OutputFormat_CSV:
+        default:
+            fprintf(stderr, "Report output format not implemented.\n");
+            _showUsage(argv[0]);
+            exit(-1);
+    }
 
     // The buffer to store a single packet at a time (64KB is the max packet size).
     if (liveMode) {

@@ -17,6 +17,11 @@ typedef struct {
     cJSON *currentPacket;
 } _JSONReporterContext;
 
+typedef struct {
+    _FileReporterContext *fileContext;
+    // TODO: what else?
+} _CSVReporterContext;
+
 struct reporter {
     void (*start)(void *);
     void (*end)(void *);
@@ -36,6 +41,12 @@ _fileReporter_GetFileDescriptor(_FileReporterContext *context)
 
 FILE *
 _jsonReporter_GetFileDescriptor(_JSONReporterContext *context)
+{
+    return context->fileContext->fp;
+}
+
+FILE *
+_csvReporter_GetFileDescriptor(_CSVReporterContext *context)
 {
     return context->fileContext->fp;
 }
@@ -147,6 +158,38 @@ _jsonReporter_Destroy(_JSONReporterContext **contextPtr)
     *contextPtr = NULL;
 }
 
+static void
+_csvReporter_Report(_CSVReporterContext *context, uint32_t numberOfTypes, uint16_t type[numberOfTypes], Buffer *buffer)
+{
+    // TODO
+}
+
+static void
+_csvReporter_Start(_CSVReporterContext *context)
+{
+    // context->currentPacket = cJSON_CreateObject();
+}
+
+static void
+_csvReporter_End(_CSVReporterContext *context)
+{
+    // char *packetString = cJSON_Print(context->currentPacket);
+    // fprintf(context->fileContext->fp, "%s\n", packetString);
+    // free(packetString);
+    // cJSON_Delete(context->currentPacket);
+    // context->currentPacket = NULL;
+}
+
+static void
+_csvReporter_Destroy(_CSVReporterContext **contextPtr)
+{
+    _CSVReporterContext *reporter = *contextPtr;
+    // TODO
+    // _fileReporter_Destroy(&reporter->fileContext);
+    free(reporter);
+    *contextPtr = NULL;
+}
+
 // TODO: CSV repoter writes a single header out to the file (based on filter) and then,
 //   for each packet, collects the list of buffers to write and then writes it out when "finalized"
 
@@ -178,10 +221,34 @@ reporter_CreateJSONFileReporter(FILE *fd)
     reporter->end = (void (*)(void *)) _jsonReporter_End;
     reporter->destroy = (void (*)(void **)) _jsonReporter_Destroy;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _jsonReporter_GetFileDescriptor;
-    reporter->hasFilter = false;
+    reporter->hasFilter = true;
 
     _JSONReporterContext *context = malloc(sizeof(_JSONReporterContext));
     context->currentPacket = NULL;
+
+    _FileReporterContext *fileContext = malloc(sizeof(_FileReporterContext));
+    fileContext->fp = fd;
+    fileContext->numPackets = 0;
+    context->fileContext = fileContext;
+
+    reporter->context = context;
+
+    return reporter;
+}
+
+Reporter *
+reporter_CreateCSVFileReporter(FILE *fd)
+{
+    Reporter *reporter = malloc(sizeof(Reporter));
+    reporter->reportFunction = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _csvReporter_Report;
+    reporter->start = (void (*)(void *)) _csvReporter_Start;
+    reporter->end = (void (*)(void *)) _csvReporter_End;
+    reporter->destroy = (void (*)(void **)) _csvReporter_Destroy;
+    reporter->getFileDescriptor = (FILE *(*)(void *)) _csvReporter_GetFileDescriptor;
+    reporter->hasFilter = true;
+
+    _CSVReporterContext *context = malloc(sizeof(_CSVReporterContext));
+    // context->currentPacket = NULL;
 
     _FileReporterContext *fileContext = malloc(sizeof(_FileReporterContext));
     fileContext->fp = fd;

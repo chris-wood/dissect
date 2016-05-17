@@ -59,7 +59,7 @@ types_ParseStringTree(char *treeString, uint32_t *numberOfTypes, uint16_t **type
     TypespaceTreeNode *root = &top_level_types_node;
 
     uint32_t numTypes = 0;
-    char *token = strtok(treeString, " ");
+    char *token = strtok(treeString, "/");
 
     // TODO: we should assert this to be true
     *type = NULL;

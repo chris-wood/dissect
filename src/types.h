@@ -108,12 +108,12 @@ static uint16_t top_level_types[6] = {
 };
 
 static char *top_level_type_strings[6] = {
-    "CCNxTypespace_MessageType_Interest",
-    "CCNxTypespace_MessageType_ContentObject",
-    "CCNxTypespace_MessageType_ValidationAlg",
-    "CCNxTypespace_MessageType_ValidationPayload",
-    "CCNxTypespace_MessageType_Manifest",
-    "CCNxTypespace_MessageType_Control"
+    "Interest",
+    "ContentObject",
+    "ValidationAlg",
+    "ValidationPayload",
+    "Manifest",
+    "Control"
 };
 
 static uint16_t message_types[7] = {
@@ -127,13 +127,13 @@ static uint16_t message_types[7] = {
 };
 
 static char *message_type_strings[8] = {
-    "CCNxTypespace_CCNxMessage_Name",
-    "CCNxTypespace_CCNxMessage_Payload",
-    "CCNxTypespace_CCNxMessage_KeyIdRestriction",
-    "CCNxTypespace_CCNxMessage_ContentObjectHashRestriction",
-    "CCNxTypespace_CCNxMessage_PayloadType",
-    "CCNxTypespace_CCNxMessage_ExpiryTime",
-    "CCNxTypespace_CCNxMessage_EndChunkNumber"
+    "Name",
+    "Payload",
+    "KeyIdRestriction",
+    "ContentObjectHashRestriction",
+    "PayloadType",
+    "ExpiryTime",
+    "EndChunkNumber"
 };
 
 static uint16_t name_types[2] = {
@@ -142,8 +142,8 @@ static uint16_t name_types[2] = {
 };
 
 static char *name_type_strings[8] = {
-    "CCNxTypespace_CCNxName_NameSegment",
-    "CCNxTypespace_CCNxName_PayloadID",
+    "NameSegment",
+    "PayloadID",
 };
 
 static uint16_t validation_alg_types[9] = {
@@ -159,17 +159,16 @@ static uint16_t validation_alg_types[9] = {
 };
 
 static char *validation_alg_type_strings[9] = {
-    "CCNxTypespace_ValidationAlg_CRC32C",
-    "CCNxTypespace_ValidationAlg_HMAC_SHA256",
-    "CCNxTypespace_ValidationAlg_RSA_SHA256",
-    "CCNxTypespace_ValidationAlg_EC_SECP_256K1",
-    "CCNxTypespace_ValidationAlg_KeyId",
-    "CCNxTypespace_ValidationAlg_PublicKey",
-    "CCNxTypespace_ValidationAlg_Cert",
-    "CCNxTypespace_ValidationAlg_KeyName",
-    "CCNxTypespace_ValidationAlg_SigTime"
+    "CRC32C",
+    "HMAC_SHA256",
+    "RSA_SHA256",
+    "EC_SECP_256K1",
+    "KeyId",
+    "PublicKey",
+    "Cert",
+    "KeyName",
+    "SigTime"
 };
-
 
 // A generic node that we can use to stich together the typespace tree
 struct typespace_tree_node;

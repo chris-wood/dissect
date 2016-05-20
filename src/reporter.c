@@ -34,7 +34,7 @@ struct reporter {
 
     int numberOfFilters;
     uint32_t *filterNumbers;
-    uint16_t ***filterTrees;
+    uint16_t **filterTrees;
 };
 
 FILE *
@@ -301,7 +301,30 @@ reporter_EndPacket(Reporter *reporter)
 void
 reporter_ReportTLV(Reporter *reporter, uint32_t numberOfTypes, uint16_t type[numberOfTypes], Buffer *value)
 {
-    reporter->reportFunction(reporter->context, numberOfTypes, type, value);
+    bool process = true; // show all by default if no filters are specified
+    if (reporter->numberOfFilters > 0) {
+        process = false;
+        for (int i = 0; i < reporter->numberOfFilters; i++) {
+            if (numberOfTypes == reporter->filterNumbers[i]) {
+                bool allMatch = true;
+                for (int j = 0; j < numberOfTypes; j++) {
+                    if (reporter->filterTrees[i][j] != type[j]) {
+                        allMatch = false;
+                        break;
+                    }
+                }
+                if (allMatch) {
+                    process = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    printf("Process? %d\n", process);
+    if (process) {
+        reporter->reportFunction(reporter->context, numberOfTypes, type, value);
+    }
 }
 
 bool
@@ -334,10 +357,11 @@ reporter_AddFilterByString(Reporter *reporter, char *filter)
     reporter->filterNumbers[reporter->numberOfFilters - 1] = numberOfTypes;
 
     if (reporter->filterTrees == NULL) {
-        reporter->filterTrees = (uint16_t ***) malloc(reporter->numberOfFilters * sizeof(uint16_t**));
+        reporter->filterTrees = (uint16_t **) malloc(reporter->numberOfFilters * sizeof(uint16_t**));
     } else {
-        reporter->filterTrees = (uint16_t ***) realloc(reporter->filterTrees, reporter->numberOfFilters * sizeof(uint16_t**));
+        reporter->filterTrees = (uint16_t **) realloc(reporter->filterTrees, reporter->numberOfFilters * sizeof(uint16_t**));
     }
+    reporter->filterTrees[reporter->numberOfFilters - 1] = (uint16_t *) malloc(numberOfTypes * sizeof(uint16_t));
     memcpy(reporter->filterTrees[reporter->numberOfFilters - 1], types, sizeof(uint16_t) * numberOfTypes);
 
     return true;

@@ -61,13 +61,14 @@ types_ParseStringTree(char *treeString, uint32_t *numberOfTypes, uint16_t **type
     uint32_t numTypes = 0;
     char *token = strtok(treeString, "/");
 
-    // TODO: we should assert this to be true
+    // TODO: we should assert this to be true so there are no leaks.
     *type = NULL;
 
     while (token) {
         bool match = false;
         for (int i = 0; i < root->numTypes; i++) {
             if (strcmp(token, root->typeStrings[i]) == 0) {
+
                 numTypes++;
                 if (*type == NULL) {
                     *type = malloc(numTypes * sizeof(**type));
@@ -76,9 +77,16 @@ types_ParseStringTree(char *treeString, uint32_t *numberOfTypes, uint16_t **type
                 }
                 *type[numTypes - 1] = root->types[i];
 
+                if (root->numChildren > 0) {
+                    // TODO: this is a bug. need to implement a stack for DFS down the type tree
+                    root = root->children[0];
+                }
+
                 match = true;
+                break;
             }
         }
+
         if (!match) {
             if (*type != NULL) {
                 free(*type);
@@ -91,4 +99,6 @@ types_ParseStringTree(char *treeString, uint32_t *numberOfTypes, uint16_t **type
         // Continue down the tree.
         token = strtok(NULL, " ");
     }
+
+    *numberOfTypes = numTypes;
 }

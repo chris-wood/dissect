@@ -17,7 +17,7 @@ bool reporter_IsRaw(Reporter *reporter);
 FILE *reporter_GetFileDescriptor(Reporter *reporter);
 
 // TODO: need a function to set a filter for the reporter (i.e., what types to report and not)
-//   reporter_AddFilterByString(Reporter *reporter, char *filter) --> add a function to types.h to parse a string like "/interest/name/" to a type tree
+bool reporter_AddFilterByString(Reporter *reporter, char *filter); // --> add a function to types.h to parse a string like "/interest/name/" to a type tree
 //   reporter_AddFilterByTypeTree(Reporter *reporter, <type tree>)
 
 void reporter_StartPacket(Reporter *reporter);

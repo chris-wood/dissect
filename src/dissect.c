@@ -9,6 +9,8 @@
 #include "packet.h"
 #include "capture.h"
 
+#define DEBUG 1
+
 // usage:
 // - read from stdin and dump to stdout
 // - specify filters (as SQL query or a list of fields to extract)
@@ -47,18 +49,22 @@ main(int argc, char **argv)
     bool liveMode = false;
     bool fileMode = false;
 
+    char **filters = NULL;
+    int numFilters = 0;
+
     _OutputFormat outputFormat = _OutputFormat_Raw;
 
     static struct option longopts[] = {
         { "output",         required_argument, NULL, 'o' },
         { "capture",        required_argument, NULL, 'c' },
         { "traffic_filter", required_argument, NULL, 't' },
-        { "file",           required_argument, NULL, 'f' },
+        { "input_file",     required_argument, NULL, 'i' },
+        { "filter",         required_argument, NULL, 'f' },
         { "help",           no_argument,       NULL, 'h' },
         { NULL,             0,                 NULL, 0   }
     };
 
-    while ((value = getopt_long(argc, argv, "o:c:t:f:h", longopts, NULL)) != -1) {
+    while ((value = getopt_long(argc, argv, "o:c:t:f:i:h", longopts, NULL)) != -1) {
         switch (value) {
             case 'o':
                 cvalue = optarg;
@@ -77,7 +83,17 @@ main(int argc, char **argv)
             case 't':
                 asprintf(&filterString, "%s", optarg);
                 break;
-            case 'f':
+            case 'f': {
+                if (filters == NULL) {
+                    filters = (char **) malloc((numFilters++) * sizeof(char *));
+                } else {
+                    filters = (char **) realloc(filters, (numFilters++) * sizeof(char*));
+                }
+
+                asprintf(&filters[numFilters - 1], "%s", optarg);
+                break;
+            }
+            case 'i':
                 asprintf(&fileName, "%s", optarg);
                 fileMode = true;
                 break;
@@ -93,6 +109,12 @@ main(int argc, char **argv)
         exit(0);
     }
 
+#if DEBUG
+    for (int i = 0; i < numFilters; i++) {
+        printf("Filter: %s\n", filters[i]);
+    }
+#endif
+
     Reporter *reporter = NULL;
     switch (outputFormat) {
         case _OutputFormat_Raw:
@@ -106,6 +128,10 @@ main(int argc, char **argv)
             fprintf(stderr, "Report output format not implemented.\n");
             _showUsage(argv[0]);
             exit(-1);
+    }
+
+    for (int i = 0; i < numFilters; i++) {
+        reporter_AddFilterByString(reporter, filters[i]);
     }
 
     // The buffer to store a single packet at a time (64KB is the max packet size).

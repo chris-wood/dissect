@@ -31,6 +31,10 @@ struct reporter {
     FILE *(*getFileDescriptor)(void *);
     void *context; // sloppy
     bool hasFilter;
+
+    int numberOfFilters;
+    uint32_t *filterNumbers;
+    uint16_t ***filterTrees;
 };
 
 FILE *
@@ -204,6 +208,10 @@ reporter_CreateRawFileReporter(FILE *fd)
     reporter->getFileDescriptor = (FILE *(*)(void *)) _fileReporter_GetFileDescriptor;
     reporter->hasFilter = false;
 
+    reporter->numberOfFilters = 0;
+    reporter->filterNumbers = NULL;
+    reporter->filterTrees = NULL;
+
     _FileReporterContext *context = malloc(sizeof(_FileReporterContext));
     context->fp = fd;
     context->numPackets = 0;
@@ -222,6 +230,10 @@ reporter_CreateJSONFileReporter(FILE *fd)
     reporter->destroy = (void (*)(void **)) _jsonReporter_Destroy;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _jsonReporter_GetFileDescriptor;
     reporter->hasFilter = true;
+
+    reporter->numberOfFilters = 0;
+    reporter->filterNumbers = NULL;
+    reporter->filterTrees = NULL;
 
     _JSONReporterContext *context = malloc(sizeof(_JSONReporterContext));
     context->currentPacket = NULL;
@@ -247,8 +259,11 @@ reporter_CreateCSVFileReporter(FILE *fd)
     reporter->getFileDescriptor = (FILE *(*)(void *)) _csvReporter_GetFileDescriptor;
     reporter->hasFilter = true;
 
+    reporter->numberOfFilters = 0;
+    reporter->filterNumbers = NULL;
+    reporter->filterTrees = NULL;
+
     _CSVReporterContext *context = malloc(sizeof(_CSVReporterContext));
-    // context->currentPacket = NULL;
 
     _FileReporterContext *fileContext = malloc(sizeof(_FileReporterContext));
     fileContext->fp = fd;
@@ -299,4 +314,31 @@ FILE *
 reporter_GetFileDescriptor(Reporter *reporter)
 {
     return reporter->getFileDescriptor(reporter->context);
+}
+
+bool
+reporter_AddFilterByString(Reporter *reporter, char *filter)
+{
+    uint32_t numberOfTypes;
+    uint16_t *types;
+    types_ParseStringTree(filter, &numberOfTypes, &types);
+
+    // Add the new filter to the list
+    reporter->numberOfFilters++;
+
+    if (reporter->filterNumbers == NULL) {
+        reporter->filterNumbers = (uint32_t *) malloc(reporter->numberOfFilters * sizeof(uint32_t));
+    } else {
+        reporter->filterNumbers = (uint32_t *) realloc(reporter->filterNumbers, reporter->numberOfFilters * sizeof(uint32_t));
+    }
+    reporter->filterNumbers[reporter->numberOfFilters - 1] = numberOfTypes;
+
+    if (reporter->filterTrees == NULL) {
+        reporter->filterTrees = (uint16_t ***) malloc(reporter->numberOfFilters * sizeof(uint16_t**));
+    } else {
+        reporter->filterTrees = (uint16_t ***) realloc(reporter->filterTrees, reporter->numberOfFilters * sizeof(uint16_t**));
+    }
+    memcpy(reporter->filterTrees[reporter->numberOfFilters - 1], types, sizeof(uint16_t) * numberOfTypes);
+
+    return true;
 }

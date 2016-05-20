@@ -8,8 +8,8 @@
 #include "cJSON.h"
 
 typedef struct {
-    FILE *fp;
     size_t numPackets;
+    FILE *fp;
 } _FileReporterContext;
 
 typedef struct {
@@ -29,12 +29,14 @@ struct reporter {
     void (*destroy)(void **);
 
     FILE *(*getFileDescriptor)(void *);
-    void *context; // sloppy
-    bool isRaw;
 
     int numberOfFilters;
     uint32_t *filterNumbers;
     uint16_t **filterTrees;
+
+    bool isRaw;
+
+    void *context; // sloppy
 };
 
 FILE *
@@ -138,7 +140,6 @@ static void
 _jsonReporter_Start(_JSONReporterContext *context)
 {
     context->currentPacket = cJSON_CreateObject();
-    char *packetString = cJSON_Print(context->currentPacket);
 }
 
 static void

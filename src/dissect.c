@@ -134,7 +134,6 @@ main(int argc, char **argv)
         reporter_AddFilterByString(reporter, filters[i]);
     }
 
-    // The buffer to store a single packet at a time (64KB is the max packet size).
     if (liveMode) {
         captureFromDevice(reporter, deviceString, filterString);
     } else if (fileMode) {

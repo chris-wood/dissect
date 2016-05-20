@@ -30,7 +30,7 @@ struct reporter {
 
     FILE *(*getFileDescriptor)(void *);
     void *context; // sloppy
-    bool hasFilter;
+    bool isRaw;
 
     int numberOfFilters;
     uint32_t *filterNumbers;
@@ -145,7 +145,6 @@ static void
 _jsonReporter_End(_JSONReporterContext *context)
 {
     char *packetString = cJSON_Print(context->currentPacket);
-    printf("%s\n", packetString);
     fprintf(context->fileContext->fp, "%s\n", packetString);
     free(packetString);
     cJSON_Delete(context->currentPacket);
@@ -208,7 +207,7 @@ reporter_CreateRawFileReporter(FILE *fd)
     reporter->end = (void (*)(void *)) _fileReporter_End;
     reporter->destroy = (void (*)(void **)) _fileReporter_Destroy;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _fileReporter_GetFileDescriptor;
-    reporter->hasFilter = false;
+    reporter->isRaw = false;
 
     reporter->numberOfFilters = 0;
     reporter->filterNumbers = NULL;
@@ -231,7 +230,7 @@ reporter_CreateJSONFileReporter(FILE *fd)
     reporter->end = (void (*)(void *)) _jsonReporter_End;
     reporter->destroy = (void (*)(void **)) _jsonReporter_Destroy;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _jsonReporter_GetFileDescriptor;
-    reporter->hasFilter = true;
+    reporter->isRaw = true;
 
     reporter->numberOfFilters = 0;
     reporter->filterNumbers = NULL;
@@ -259,7 +258,7 @@ reporter_CreateCSVFileReporter(FILE *fd)
     reporter->end = (void (*)(void *)) _csvReporter_End;
     reporter->destroy = (void (*)(void **)) _csvReporter_Destroy;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _csvReporter_GetFileDescriptor;
-    reporter->hasFilter = true;
+    reporter->isRaw = true;
 
     reporter->numberOfFilters = 0;
     reporter->filterNumbers = NULL;
@@ -331,7 +330,7 @@ reporter_ReportTLV(Reporter *reporter, uint32_t numberOfTypes, uint16_t type[num
 bool
 reporter_IsRaw(Reporter *reporter)
 {
-    return !reporter->hasFilter;
+    return !reporter->isRaw;
 }
 
 FILE *
@@ -358,9 +357,9 @@ reporter_AddFilterByString(Reporter *reporter, char *filter)
     reporter->filterNumbers[reporter->numberOfFilters - 1] = numberOfTypes;
 
     if (reporter->filterTrees == NULL) {
-        reporter->filterTrees = (uint16_t **) malloc(reporter->numberOfFilters * sizeof(uint16_t**));
+        reporter->filterTrees = (uint16_t **) malloc(reporter->numberOfFilters * sizeof(uint16_t*));
     } else {
-        reporter->filterTrees = (uint16_t **) realloc(reporter->filterTrees, reporter->numberOfFilters * sizeof(uint16_t**));
+        reporter->filterTrees = (uint16_t **) realloc(reporter->filterTrees, reporter->numberOfFilters * sizeof(uint16_t*));
     }
     reporter->filterTrees[reporter->numberOfFilters - 1] = (uint16_t *) malloc(numberOfTypes * sizeof(uint16_t));
     memcpy(reporter->filterTrees[reporter->numberOfFilters - 1], types, sizeof(uint16_t) * numberOfTypes);

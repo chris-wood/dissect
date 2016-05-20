@@ -138,12 +138,14 @@ static void
 _jsonReporter_Start(_JSONReporterContext *context)
 {
     context->currentPacket = cJSON_CreateObject();
+    char *packetString = cJSON_Print(context->currentPacket);
 }
 
 static void
 _jsonReporter_End(_JSONReporterContext *context)
 {
     char *packetString = cJSON_Print(context->currentPacket);
+    printf("%s\n", packetString);
     fprintf(context->fileContext->fp, "%s\n", packetString);
     free(packetString);
     cJSON_Delete(context->currentPacket);
@@ -305,9 +307,9 @@ reporter_ReportTLV(Reporter *reporter, uint32_t numberOfTypes, uint16_t type[num
     if (reporter->numberOfFilters > 0) {
         process = false;
         for (int i = 0; i < reporter->numberOfFilters; i++) {
-            if (numberOfTypes == reporter->filterNumbers[i]) {
+            if (numberOfTypes >= reporter->filterNumbers[i]) {
                 bool allMatch = true;
-                for (int j = 0; j < numberOfTypes; j++) {
+                for (int j = 0; j < reporter->filterNumbers[i]; j++) {
                     if (reporter->filterTrees[i][j] != type[j]) {
                         allMatch = false;
                         break;
@@ -321,7 +323,6 @@ reporter_ReportTLV(Reporter *reporter, uint32_t numberOfTypes, uint16_t type[num
         }
     }
 
-    printf("Process? %d\n", process);
     if (process) {
         reporter->reportFunction(reporter->context, numberOfTypes, type, value);
     }

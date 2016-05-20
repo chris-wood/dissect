@@ -55,7 +55,7 @@ main(int argc, char **argv)
     _OutputFormat outputFormat = _OutputFormat_Raw;
 
     static struct option longopts[] = {
-        { "output",         required_argument, NULL, 'o' },
+        { "output_mode",    required_argument, NULL, 'm' },
         { "capture",        required_argument, NULL, 'c' },
         { "traffic_filter", required_argument, NULL, 't' },
         { "input_file",     required_argument, NULL, 'i' },
@@ -64,9 +64,9 @@ main(int argc, char **argv)
         { NULL,             0,                 NULL, 0   }
     };
 
-    while ((value = getopt_long(argc, argv, "o:c:t:f:i:h", longopts, NULL)) != -1) {
+    while ((value = getopt_long(argc, argv, "m:c:t:f:i:h", longopts, NULL)) != -1) {
         switch (value) {
-            case 'o':
+            case 'm':
                 cvalue = optarg;
                 if (strcmp(cvalue, "json") == 0) {
                     outputFormat = _OutputFormat_JSON;

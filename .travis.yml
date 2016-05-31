@@ -1,2 +1,3 @@
 language: C
+compiler: clang
 script: cmake . && make 

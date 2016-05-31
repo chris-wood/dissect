@@ -3,4 +3,4 @@ compiler: clang
 script: cmake . && make 
 before_install: 
   - sudo apt-get install -qq libpcap-dev
-  - ./install-cmocka.sh
+  #- ./install-cmocka.sh

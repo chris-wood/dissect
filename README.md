@@ -1,5 +1,7 @@
 # dissect
 
+[![Build Status](https://travis-ci.org/chris-wood/dissect.svg?branch=master)](https://travis-ci.org/chris-wood/dissect)
+
 CCNx packet dissector. Existing features:
 
 - JSON and CSV output formatters.

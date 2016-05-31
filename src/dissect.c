@@ -77,11 +77,11 @@ main(int argc, char **argv)
                 }
                 break;
             case 'c':
-                deviceString = optarg
+                deviceString = optarg;
                 liveMode = true;
                 break;
             case 't':
-                asprintf(&filterString, "%s", optarg);
+                filterString = optarg;
                 break;
             case 'f': {
                 if (filters == NULL) {
@@ -90,11 +90,11 @@ main(int argc, char **argv)
                     filters = (char **) realloc(filters, (numFilters++) * sizeof(char*));
                 }
 
-                asprintf(&filters[numFilters - 1], "%s", optarg);
+                filters[numFilters - 1] = optarg;
                 break;
             }
             case 'i':
-                asprintf(&fileName, "%s", optarg);
+                fileName = optarg;
                 fileMode = true;
                 break;
             case 'h':

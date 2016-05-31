@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.7)
 project(dissect)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c99")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu99")
 
 set(SOURCE_FILES
     src/packet.c
@@ -32,8 +33,11 @@ set(CMAKE_C_FLAGS_DEBUG_INIT "-g")
 include_directories(src)
 
 add_library(libdissect ${SOURCE_FILES})
+set_property(TARGET libdissect PROPERTY C_STANDARD 99)
 add_executable(dissect src/dissect.c)
 target_link_libraries(dissect libdissect pcap)
+set_property(TARGET dissect PROPERTY C_STANDARD 99)
 
 add_executable(test_packet src/test/test_packet.c)
 target_link_libraries(test_packet libdissect cmocka pcap)
+set_property(TARGET test_packet PROPERTY C_STANDARD 99)

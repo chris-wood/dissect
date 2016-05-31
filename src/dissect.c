@@ -77,7 +77,7 @@ main(int argc, char **argv)
                 }
                 break;
             case 'c':
-                asprintf(&deviceString, "%s", optarg);
+                deviceString = optarg
                 liveMode = true;
                 break;
             case 't':

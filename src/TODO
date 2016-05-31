@@ -1,5 +1,3 @@
-1. type string to type tree code (in types.c): /interest/name => type tree
-2. define API/options for specifying filter fields (maybe in a file?)
 3. create a struct to hold the type tree parameter info so I can return it from the type tree parse code
 4. add tests for buffer
 5. add tests for reporter

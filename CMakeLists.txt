@@ -16,9 +16,11 @@ set(SOURCE_FILES
     src/reporter.h
     src/types.c
     src/types.h
-    src/util.h
     src/cJSON.c
     src/cJSON.h
+    src/omap.c
+    src/omap.h
+    src/util.h
     )
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)

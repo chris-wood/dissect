@@ -257,6 +257,33 @@ src/dissect.c.s:
 	$(MAKE) -f CMakeFiles/dissect.dir/build.make CMakeFiles/dissect.dir/src/dissect.c.s
 .PHONY : src/dissect.c.s
 
+src/omap.o: src/omap.c.o
+
+.PHONY : src/omap.o
+
+# target to build an object file
+src/omap.c.o:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/omap.c.o
+.PHONY : src/omap.c.o
+
+src/omap.i: src/omap.c.i
+
+.PHONY : src/omap.i
+
+# target to preprocess a source file
+src/omap.c.i:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/omap.c.i
+.PHONY : src/omap.c.i
+
+src/omap.s: src/omap.c.s
+
+.PHONY : src/omap.s
+
+# target to generate assembly for a file
+src/omap.c.s:
+	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/omap.c.s
+.PHONY : src/omap.c.s
+
 src/packet.o: src/packet.c.o
 
 .PHONY : src/packet.o
@@ -415,6 +442,9 @@ help:
 	@echo "... src/dissect.o"
 	@echo "... src/dissect.i"
 	@echo "... src/dissect.s"
+	@echo "... src/omap.o"
+	@echo "... src/omap.i"
+	@echo "... src/omap.s"
 	@echo "... src/packet.o"
 	@echo "... src/packet.i"
 	@echo "... src/packet.s"

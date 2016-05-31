@@ -151,6 +151,7 @@ packet_Report(Packet *packet, Reporter *reporter)
 {
     reporter_StartPacket(reporter);
 
+    // TODO: isFormatted?
     if (reporter_IsRaw(reporter)) {
         packet_Display(packet, reporter_GetFileDescriptor(reporter), 0);
     } else {

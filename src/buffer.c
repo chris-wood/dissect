@@ -20,12 +20,6 @@ bufferOverlay_CreateFromBuffer(Buffer *b, uint32_t offset, uint32_t length)
     overlay->length = length;
     overlay->bytes = b->bytes + offset;
 
-    // overlay->bytes = malloc(length); //&(b->bytes[offset]);
-    // for (int i = 0; i < length; i++) {
-    //     overlay->bytes[i] = b->bytes[i + offset];
-    // }
-    // // overlay->offset = offset;
-
     return overlay;
 }
 

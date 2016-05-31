@@ -6,6 +6,7 @@
 #include "reporter.h"
 #include "types.h"
 #include "cJSON.h"
+#include "omap.h"
 
 typedef struct {
     size_t numPackets;
@@ -19,13 +20,14 @@ typedef struct {
 
 typedef struct {
     _FileReporterContext *fileContext;
-    // TODO: what else?
+    OrderedMap *map;
 } _CSVReporterContext;
 
 struct reporter {
     void (*start)(void *);
     void (*end)(void *);
-    void (*reportFunction)(void *, uint32_t , uint16_t *, Buffer *);
+    void (*addFilter)(void *, uint32_t , uint16_t *);
+    void (*report)(void *, uint32_t , uint16_t *, Buffer *);
     void (*destroy)(void **);
 
     FILE *(*getFileDescriptor)(void *);
@@ -55,6 +57,13 @@ FILE *
 _csvReporter_GetFileDescriptor(_CSVReporterContext *context)
 {
     return context->fileContext->fp;
+}
+
+void
+_csvReporter_AddFilter(_CSVReporterContext *context, uint32_t numberOfTypes, uint16_t type[numberOfTypes])
+{
+    char *typeString = types_TreeToString(numberOfTypes, type);
+    orderedMap_AddKey(context->map, typeString);
 }
 
 static void
@@ -167,47 +176,65 @@ _jsonReporter_Destroy(_JSONReporterContext **contextPtr)
 static void
 _csvReporter_Report(_CSVReporterContext *context, uint32_t numberOfTypes, uint16_t type[numberOfTypes], Buffer *buffer)
 {
-    // TODO
+    char *typeString = types_TreeToString(numberOfTypes, type);
+    orderedMap_Put(context->map, typeString, buffer);
 }
 
 static void
 _csvReporter_Start(_CSVReporterContext *context)
 {
-    // context->currentPacket = cJSON_CreateObject();
+    orderedMap_DropAll(context->map);
+}
+
+static void
+_csvReporter_PrintValueAtIndex(_CSVReporterContext *context, int index)
+{
+    char *key = orderedMap_GetKeyAtIndex(context->map, index);
+    if (key != NULL) {
+        Buffer *value = orderedMap_Get(context->map, key);
+        if (value != NULL) {
+            char *bufferString = buffer_ToString(value);
+            if (bufferString != NULL && strlen(bufferString) > 0) {
+                fprintf(context->fileContext->fp, "%s", bufferString);
+            }
+            free(bufferString);
+        }
+    }
 }
 
 static void
 _csvReporter_End(_CSVReporterContext *context)
 {
-    // char *packetString = cJSON_Print(context->currentPacket);
-    // fprintf(context->fileContext->fp, "%s\n", packetString);
-    // free(packetString);
-    // cJSON_Delete(context->currentPacket);
-    // context->currentPacket = NULL;
+    int numKeys = orderedMap_GetNumberOfKeys(context->map);
+
+    for (int i = 0; i < numKeys - 1; i++) {
+        _csvReporter_PrintValueAtIndex(context, i);
+        fprintf(context->fileContext->fp, ",");
+    }
+
+    _csvReporter_PrintValueAtIndex(context, numKeys - 1);
+    fprintf(context->fileContext->fp, "\n");
 }
 
 static void
 _csvReporter_Destroy(_CSVReporterContext **contextPtr)
 {
     _CSVReporterContext *reporter = *contextPtr;
-    // TODO
-    // _fileReporter_Destroy(&reporter->fileContext);
+    _fileReporter_Destroy(&reporter->fileContext);
     free(reporter);
     *contextPtr = NULL;
 }
-
-// TODO: CSV repoter writes a single header out to the file (based on filter) and then,
-//   for each packet, collects the list of buffers to write and then writes it out when "finalized"
 
 Reporter *
 reporter_CreateRawFileReporter(FILE *fd)
 {
     Reporter *reporter = malloc(sizeof(Reporter));
-    reporter->reportFunction = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _fileReporter_Report;
+    reporter->report = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _fileReporter_Report;
     reporter->start = (void (*)(void *)) _fileReporter_Start;
     reporter->end = (void (*)(void *)) _fileReporter_End;
     reporter->destroy = (void (*)(void **)) _fileReporter_Destroy;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _fileReporter_GetFileDescriptor;
+    reporter->addFilter = NULL;
     reporter->isRaw = false;
 
     reporter->numberOfFilters = 0;
@@ -226,11 +253,12 @@ Reporter *
 reporter_CreateJSONFileReporter(FILE *fd)
 {
     Reporter *reporter = malloc(sizeof(Reporter));
-    reporter->reportFunction = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _jsonReporter_Report;
+    reporter->report = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _jsonReporter_Report;
     reporter->start = (void (*)(void *)) _jsonReporter_Start;
     reporter->end = (void (*)(void *)) _jsonReporter_End;
     reporter->destroy = (void (*)(void **)) _jsonReporter_Destroy;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _jsonReporter_GetFileDescriptor;
+    reporter->addFilter = NULL;
     reporter->isRaw = true;
 
     reporter->numberOfFilters = 0;
@@ -254,11 +282,12 @@ Reporter *
 reporter_CreateCSVFileReporter(FILE *fd)
 {
     Reporter *reporter = malloc(sizeof(Reporter));
-    reporter->reportFunction = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _csvReporter_Report;
+    reporter->report = (void (*)(void *, uint32_t, uint16_t *, Buffer *)) _csvReporter_Report;
     reporter->start = (void (*)(void *)) _csvReporter_Start;
     reporter->end = (void (*)(void *)) _csvReporter_End;
     reporter->destroy = (void (*)(void **)) _csvReporter_Destroy;
     reporter->getFileDescriptor = (FILE *(*)(void *)) _csvReporter_GetFileDescriptor;
+    reporter->addFilter = (void (*)(void *, uint32_t, uint16_t *)) _csvReporter_AddFilter;
     reporter->isRaw = true;
 
     reporter->numberOfFilters = 0;
@@ -270,7 +299,9 @@ reporter_CreateCSVFileReporter(FILE *fd)
     _FileReporterContext *fileContext = malloc(sizeof(_FileReporterContext));
     fileContext->fp = fd;
     fileContext->numPackets = 0;
+
     context->fileContext = fileContext;
+    context->map = orderedMap_Create();
 
     reporter->context = context;
 
@@ -324,7 +355,7 @@ reporter_ReportTLV(Reporter *reporter, uint32_t numberOfTypes, uint16_t type[num
     }
 
     if (process) {
-        reporter->reportFunction(reporter->context, numberOfTypes, type, value);
+        reporter->report(reporter->context, numberOfTypes, type, value);
     }
 }
 
@@ -340,13 +371,17 @@ reporter_GetFileDescriptor(Reporter *reporter)
     return reporter->getFileDescriptor(reporter->context);
 }
 
-bool
-reporter_AddFilterByString(Reporter *reporter, char *filter)
+static void
+_reporter_AddFilter(Reporter *reporter, uint32_t numberOfTypes, uint16_t types[numberOfTypes])
 {
-    uint32_t numberOfTypes;
-    uint16_t *types;
-    types_ParseStringTree(filter, &numberOfTypes, &types);
+    if (reporter->addFilter != NULL) {
+        reporter->addFilter(reporter->context, numberOfTypes, types);
+    }
+}
 
+bool
+reporter_AddFilterByTypeTree(Reporter *reporter, uint32_t numberOfTypes, uint16_t types[numberOfTypes])
+{
     // Add the new filter to the list
     reporter->numberOfFilters++;
 
@@ -362,8 +397,22 @@ reporter_AddFilterByString(Reporter *reporter, char *filter)
     } else {
         reporter->filterTrees = (uint16_t **) realloc(reporter->filterTrees, reporter->numberOfFilters * sizeof(uint16_t*));
     }
+
     reporter->filterTrees[reporter->numberOfFilters - 1] = (uint16_t *) malloc(numberOfTypes * sizeof(uint16_t));
     memcpy(reporter->filterTrees[reporter->numberOfFilters - 1], types, sizeof(uint16_t) * numberOfTypes);
 
+    // Add the filter to the concrete reporter context
+    _reporter_AddFilter(reporter, numberOfTypes, types);
+
     return true;
+}
+
+bool
+reporter_AddFilterByString(Reporter *reporter, char *filter)
+{
+    uint32_t numberOfTypes;
+    uint16_t *types;
+    types_ParseStringTree(filter, &numberOfTypes, &types);
+
+    return reporter_AddFilterByTypeTree(reporter, numberOfTypes, types);
 }

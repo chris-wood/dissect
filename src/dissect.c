@@ -124,6 +124,8 @@ main(int argc, char **argv)
             reporter = reporter_CreateJSONFileReporter(stdout);
             break;
         case _OutputFormat_CSV:
+            reporter = reporter_CreateCSVFileReporter(stdout);
+            break;
         default:
             fprintf(stderr, "Report output format not implemented.\n");
             _showUsage(argv[0]);

@@ -2,8 +2,8 @@
 // Created by cwood on 2/6/16.
 //
 
-#ifndef DISSECT_PACKET_H
-#define DISSECT_PACKET_H
+#ifndef dissect_packet_h_
+#define dissect_packet_h_
 
 #include "buffer.h"
 #include "util.h"
@@ -85,4 +85,4 @@ TLV *packet_FindNestedTLV(Packet *packet, uint32_t numberOfTypes, uint16_t type[
 
 // Packet query functions
 
-#endif //DISSECT_PACKET_H
+#endif //dissect_packet_h_

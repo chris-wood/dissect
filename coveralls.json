@@ -73,12 +73,12 @@
   }],
   "git": {
     "head": {
-      "id": "016615b8f1cda1c54aa6af03948a118b300ea487",
+      "id": "4c3752a1ad8b05811218f8f641de612ecf80681d",
       "author_name": "Christopher Wood",
       "author_email": "christopherwood07@gmail.com",
       "committer_name": "Christopher Wood",
       "committer_email": "christopherwood07@gmail.com",
-      "message": "Travis badge"
+      "message": "Coveralls"
     },
     "branch": "master",
     "remotes": []

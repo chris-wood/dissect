@@ -111,6 +111,45 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named coveralls
+
+# Build rule for target.
+coveralls: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 coveralls
+.PHONY : coveralls
+
+# fast build rule for target.
+coveralls/fast:
+	$(MAKE) -f CMakeFiles/coveralls.dir/build.make CMakeFiles/coveralls.dir/build
+.PHONY : coveralls/fast
+
+#=============================================================================
+# Target rules for targets named coveralls_generate
+
+# Build rule for target.
+coveralls_generate: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 coveralls_generate
+.PHONY : coveralls_generate
+
+# fast build rule for target.
+coveralls_generate/fast:
+	$(MAKE) -f CMakeFiles/coveralls_generate.dir/build.make CMakeFiles/coveralls_generate.dir/build
+.PHONY : coveralls_generate/fast
+
+#=============================================================================
+# Target rules for targets named coveralls_upload
+
+# Build rule for target.
+coveralls_upload: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 coveralls_upload
+.PHONY : coveralls_upload
+
+# fast build rule for target.
+coveralls_upload/fast:
+	$(MAKE) -f CMakeFiles/coveralls_upload.dir/build.make CMakeFiles/coveralls_upload.dir/build
+.PHONY : coveralls_upload/fast
+
+#=============================================================================
 # Target rules for targets named dissect
 
 # Build rule for target.
@@ -135,19 +174,6 @@ libdissect: cmake_check_build_system
 libdissect/fast:
 	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/build
 .PHONY : libdissect/fast
-
-#=============================================================================
-# Target rules for targets named test_packet
-
-# Build rule for target.
-test_packet: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 test_packet
-.PHONY : test_packet
-
-# fast build rule for target.
-test_packet/fast:
-	$(MAKE) -f CMakeFiles/test_packet.dir/build.make CMakeFiles/test_packet.dir/build
-.PHONY : test_packet/fast
 
 src/buffer.o: src/buffer.c.o
 
@@ -338,33 +364,6 @@ src/reporter.c.s:
 	$(MAKE) -f CMakeFiles/libdissect.dir/build.make CMakeFiles/libdissect.dir/src/reporter.c.s
 .PHONY : src/reporter.c.s
 
-src/test/test_packet.o: src/test/test_packet.c.o
-
-.PHONY : src/test/test_packet.o
-
-# target to build an object file
-src/test/test_packet.c.o:
-	$(MAKE) -f CMakeFiles/test_packet.dir/build.make CMakeFiles/test_packet.dir/src/test/test_packet.c.o
-.PHONY : src/test/test_packet.c.o
-
-src/test/test_packet.i: src/test/test_packet.c.i
-
-.PHONY : src/test/test_packet.i
-
-# target to preprocess a source file
-src/test/test_packet.c.i:
-	$(MAKE) -f CMakeFiles/test_packet.dir/build.make CMakeFiles/test_packet.dir/src/test/test_packet.c.i
-.PHONY : src/test/test_packet.c.i
-
-src/test/test_packet.s: src/test/test_packet.c.s
-
-.PHONY : src/test/test_packet.s
-
-# target to generate assembly for a file
-src/test/test_packet.c.s:
-	$(MAKE) -f CMakeFiles/test_packet.dir/build.make CMakeFiles/test_packet.dir/src/test/test_packet.c.s
-.PHONY : src/test/test_packet.c.s
-
 src/tlv.o: src/tlv.c.o
 
 .PHONY : src/tlv.o
@@ -426,9 +425,11 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... dissect"
-	@echo "... test_packet"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... coveralls_generate"
+	@echo "... coveralls"
+	@echo "... coveralls_upload"
 	@echo "... libdissect"
 	@echo "... src/buffer.o"
 	@echo "... src/buffer.i"
@@ -451,9 +452,6 @@ help:
 	@echo "... src/reporter.o"
 	@echo "... src/reporter.i"
 	@echo "... src/reporter.s"
-	@echo "... src/test/test_packet.o"
-	@echo "... src/test/test_packet.i"
-	@echo "... src/test/test_packet.s"
 	@echo "... src/tlv.o"
 	@echo "... src/tlv.i"
 	@echo "... src/tlv.s"

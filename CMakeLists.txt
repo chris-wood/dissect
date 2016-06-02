@@ -3,6 +3,9 @@ project(dissect)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c99")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu99")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
+
+option(COVERALLS "Generate coveralls data" OFF)
 
 set(SOURCE_FILES
     src/packet.c
@@ -23,6 +26,18 @@ set(SOURCE_FILES
     src/omap.h
     src/util.h
     )
+
+if (COVERALLS)
+    include(Coveralls)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
+
+    set(COVERAGE_SOURCES ${SOURCE_FILES})
+    coveralls_setup(
+        "${COVERAGE_SOURCES}"
+        ON
+        "${PROJECT_SOURCE_DIR}/cmake/")
+endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)

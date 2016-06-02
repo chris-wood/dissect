@@ -6,3 +6,19 @@ before_install:
   - export COVERALLS_REPO_TOKEN=I6M9GXLv0oUPr7JEUIVhOQMu8eJdl49GB
   - sudo apt-get install -qq libpcap-dev
   #- ./install-cmocka.sh
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "adXTUQGWR4goGvJ4D1OzlT2Xv4Vt4bJ5zrgCS4i3zP74ygTeZrpxKzS52iZH5NAb7o7OqaCDazEIX4I3AMhbt1BGhDpOcfoaAjCfc3M+BiGhBfwFrUaN/qBodOJgwXZRTpQku9BuJnx/Flt6Cqq3KFtZJKumOlr4Am2PWNw6dKl8RFPKP6q1Q2Hkv8taP0Nhh6QxeBoDdi81xx53SlSbw6gXU2HUQePpRyXewsdAU1WeI3yJ/q61mewOWQCeYXH9l9/R6eUgZ/qVoYX+8ncotJcr7ddY6dycKdN9G0RX/6F9YC37sQzZZA8zlSjEG5kwscMRoHzZwUHRUfAA4EdwiM7WWMLJdH2XDdjPsMdtO8ALXxGB6g8+T3I5S9x4v3I1PmHliBc1ueEAcqXJbXTFjncET54t8WWG7MeYBj0YNWUkc5K4WahPhhEvkQJ1cXukVNmP8yjrfv9WoJJHZ6UID00x3hJHJMm3Wjy6G3jVmfh/ggxE7qnsOf/7ofed9GpT4+tsr8HwlL/bkPNQ3OhGTwR9P3VCfPFqvn7eTgKiMbquCbCEMmOT4g9FY2xUDTTQs+E5l2RSpoOXbhPTnSVYSVx4PL5+nm7sXCzm5T3kmVK99EgrdLqliH/ByjBjAlEnBgYkGPEDHAYo/btPGmfYEyQvwX9rKjMcQ0Wr7pQU/PE="
+
+addons:
+  coverity_scan:
+    project:
+      name: "chris-wood/dissect"
+      description: "CCNx packet dissector"
+    notification_email: christopherwood07@gmail.com
+    build_command_prepend: "sudo apt-get install -qq libpcap-dev"
+    build_command:   "cmake . && make"
+    branch_pattern: coverity_scan

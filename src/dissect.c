@@ -28,11 +28,12 @@ _showUsage(char *programName)
 {
     printf("%s: CCNx packet dissector.\n", programName);
     printf("\n");
-    printf("Usage: %s [-h] [-c <device>] [-t <pcap filter>] [-f <file name>] [-o (json | csv)]\n", programName);
+    printf("Usage: %s [-h] [-c <device>] [-f <pcap filter>] [-i <file name>] [-d <alg>] [-o (json | csv)]\n", programName);
     printf("\n");
     printf("  -c <device>:                the device from which to capture live packets \n");
-    printf("  -t <traffic filter string>: filter traffic for the live capture with this filter string (see pcap_filter() for details).\n");
-    printf("  -f <file name>:             name of the file from which to read packets.\n");
+    printf("  -f <traffic filter string>: filter traffic for the live capture with this filter string (see pcap_filter() for details).\n");
+    printf("  -i <file name>:             name of the file from which to read packets.\n");
+    printf("  -d <alg>:                   flag to output the message digest.\n");
     printf("  -o <format>:                output the packet data in <format>, where <format> is JSON or CSV. \n");
     printf("  -h:                         display this usage message\n");
 }
@@ -48,6 +49,8 @@ main(int argc, char **argv)
     int value = 0;
     bool liveMode = false;
     bool fileMode = false;
+    bool digestFlag = false;
+    char *digestAlg = "";
 
     char **filters = NULL;
     int numFilters = 0;
@@ -80,9 +83,6 @@ main(int argc, char **argv)
                 deviceString = optarg;
                 liveMode = true;
                 break;
-            case 't':
-                filterString = optarg;
-                break;
             case 'f': {
                 if (filters == NULL) {
                     filters = (char **) malloc((numFilters++) * sizeof(char *));
@@ -96,6 +96,10 @@ main(int argc, char **argv)
             case 'i':
                 fileName = optarg;
                 fileMode = true;
+                break;
+            case 'd':
+                digestFlag = true;
+                digestAlg = optarg;
                 break;
             case 'h':
             default:
@@ -114,6 +118,17 @@ main(int argc, char **argv)
         printf("Filter: %s\n", filters[i]);
     }
 #endif
+
+    // Short-circuit to just compute the message digest
+    if (digestFlag) {
+        if (strcmp(digestAlg, "SHA256") == 0) {
+            // xxx
+        } else {
+            fprintf(stderr, "Unsupported algorithm :%s\n", digestAlg);
+            exit(-1);
+        }
+        exit(0);
+    }
 
     Reporter *reporter = NULL;
     switch (outputFormat) {

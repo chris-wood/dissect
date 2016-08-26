@@ -63,14 +63,12 @@ captureFromFile(Reporter *reporter, FILE *file)
     memset(buffer, 0, BUFFER_SIZE);
 
     // Start peeking into the file and read the packet if there's something there
-    bool isMore = fgets(buffer, 5, file) != NULL;
+    bool isMore = fgets(buffer, 5, file) != NULL && !feof(file);
     while (isMore) {
         // Peek at length and fill in the tail of the buffer if necessary
         uint16_t length = (((uint16_t)(buffer[2]) << 8) & 0xFF00) | ((uint16_t)(buffer[3]) & 0x00FF);
         if (length > 0) {
             isMore = fgets(((char *) buffer) + 4, length - 4 + 1, file) != NULL;
-        } else {
-            isMore = false;
         }
 
         // Create the packet
@@ -84,9 +82,7 @@ captureFromFile(Reporter *reporter, FILE *file)
 
         // Reset the buffer and try to read in the next packet
         memset(buffer, 0, BUFFER_SIZE);
-        if (isMore) {
-            isMore = fgets(buffer, 5, file) != NULL;
-        }
+        isMore = fgets(buffer, 5, file) != NULL && feof(file);
     }
 
     return 0;

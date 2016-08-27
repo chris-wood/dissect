@@ -7,6 +7,7 @@
 #include <getopt.h>
 
 #include "packet.h"
+#include "digester.h"
 #include "capture.h"
 
 #define DEBUG 1
@@ -50,7 +51,7 @@ main(int argc, char **argv)
     bool liveMode = false;
     bool fileMode = false;
     bool digestFlag = false;
-    char *digestAlg = "";
+    DigestAlgorithm digestAlg = DigestAlgorithm_Invalid;
 
     char **filters = NULL;
     int numFilters = 0;
@@ -99,7 +100,13 @@ main(int argc, char **argv)
                 break;
             case 'd':
                 digestFlag = true;
-                digestAlg = optarg;
+                if (strcmp(optarg, "SHA256") == 0) {
+                    digestAlg = DigestAlgorithm_SHA256;
+                } else {
+                    digestAlg = DigestAlgorithm_Invalid;
+                    fprintf(stderr, "Unsupported algorithm :%d\n", digestAlg);
+                    exit(-1);
+                }
                 break;
             case 'h':
             default:
@@ -118,17 +125,6 @@ main(int argc, char **argv)
         printf("Filter: %s\n", filters[i]);
     }
 #endif
-
-    // Short-circuit to just compute the message digest
-    if (digestFlag) {
-        if (strcmp(digestAlg, "SHA256") == 0) {
-            // xxx
-        } else {
-            fprintf(stderr, "Unsupported algorithm :%s\n", digestAlg);
-            exit(-1);
-        }
-        exit(0);
-    }
 
     Reporter *reporter = NULL;
     switch (outputFormat) {
@@ -167,3 +163,4 @@ main(int argc, char **argv)
 
     reporter_Destroy(&reporter);
 }
+

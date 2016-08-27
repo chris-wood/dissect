@@ -7,6 +7,8 @@
 #include "types.h"
 #include "cJSON.h"
 #include "omap.h"
+#include "processor.h"
+#include "packet.h"
 
 typedef struct {
     size_t numPackets;
@@ -416,3 +418,15 @@ reporter_AddFilterByString(Reporter *reporter, char *filter)
 
     return reporter_AddFilterByTypeTree(reporter, numberOfTypes, types);
 }
+
+void 
+reporter_ProcessPacket(Reporter *reporter, Packet *packet)
+{
+    packet_Report(packet, reporter);
+}
+
+ProcessorInterface *ReporterAsProcessor = &(ProcessorInterface) {
+    .Init = NULL,
+    .ProcessPacket = (void (*)(void *, Packet *)) reporter_ProcessPacket,
+    .Finalize = NULL,
+};

@@ -70,19 +70,20 @@ PacketType packet_GetType(Packet *packet);
 uint16_t packet_GetLength(Packet *packet);
 uint16_t packet_GetHeaderLength(Packet *packet);
 
-// displaying and reporting func
+// displaying and reporting functions
 void packet_Display(Packet *packet, FILE *fp, int indentation);
 void packet_Report(Packet *packet, Reporter *reporter);
 
 // absolute packet fields
 Buffer *packet_GetFieldValue(Packet *packet, PacketField field);
+Buffer *packet_GetFixedHeader(Packet *packet);
+Buffer *packet_GetOptionalHeader(Packet *packet);
+Buffer *packet_GetMessage(Packet *packet);
+Buffer *packet_GetProtectedRegion(Packet *packet);
 
 // TLV iterator and query functions
 TLV *packet_GetNextTLV(Packet *packet, uint16_t offset, uint16_t length);
 bool packet_HasNextTLV(Packet *packet, uint16_t offset);
-//TLV *packet_FindTLV(TLV *tlv, uint16_t type);
 TLV *packet_FindNestedTLV(Packet *packet, uint32_t numberOfTypes, uint16_t type[numberOfTypes]);
-
-// Packet query functions
 
 #endif //dissect_packet_h_

@@ -3,9 +3,12 @@
 
 #include "types.h"
 #include "buffer.h"
+#include "processor.h"
 
 struct reporter;
 typedef struct reporter Reporter;
+
+extern ProcessorInterface *ReporterAsProcessor;
 
 Reporter *reporter_CreateRawFileReporter(FILE *fd);
 Reporter *reporter_CreateJSONFileReporter(FILE *fd);

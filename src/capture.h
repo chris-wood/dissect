@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "reporter.h"
+#include "packet.h"
 
 int captureFromFile(Reporter *reporter, FILE *file);
 

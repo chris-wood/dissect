@@ -353,6 +353,30 @@ packet_GetFieldValue(Packet *packet, PacketField field)
     return NULL;
 }
 
+Buffer *
+packet_GetFixedHeader(Packet *packet)
+{
+    return NULL;
+}
+
+Buffer *
+packet_GetOptionalHeader(Packet *packet)
+{
+    return NULL;
+}
+
+Buffer *
+packet_GetMessage(Packet *packet)
+{
+    return NULL;
+}
+
+Buffer *
+packet_GetProtectedRegion(Packet *packet)
+{
+    return NULL;
+}
+
 // This function should take bounds for the search so we can re-use it for the nested TLV search
 static TLV *
 _packet_FindTLV(TLV *tlv, uint32_t numberOfTypes, uint16_t type[numberOfTypes], size_t typeOffset)

@@ -18,6 +18,12 @@ set(SOURCE_FILES
     src/capture.h
     src/reporter.c
     src/reporter.h
+    src/processor.c
+    src/processor.h
+    src/digester.c
+    src/digester.h
+    src/lib-sha256.c
+    src/lib-sha256.h
     src/types.c
     src/types.h
     src/cJSON.c

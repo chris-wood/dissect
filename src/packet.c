@@ -374,7 +374,9 @@ packet_GetMessage(Packet *packet)
 Buffer *
 packet_GetProtectedRegion(Packet *packet)
 {
-    return NULL;
+    size_t offset = packet->header.headerLength;
+    Buffer *payload = buffer_Slice(packet->packet, offset, buffer_Size(packet->packet) - offset);
+    return payload;
 }
 
 // This function should take bounds for the search so we can re-use it for the nested TLV search

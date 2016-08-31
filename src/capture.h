@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "reporter.h"
+#include "processor.h"
 #include "packet.h"
 
-int captureFromFile(Reporter *reporter, FILE *file);
+int captureFromFile(Processor *processor, FILE *file);
 
-int captureFromDevice(Reporter *reporter, char *device, char *filter);
+int captureFromDevice(Processor *processor, char *device, char *filter);
 
 #endif // dissect_capture_h_

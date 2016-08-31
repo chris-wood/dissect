@@ -430,3 +430,10 @@ ProcessorInterface *ReporterAsProcessor = &(ProcessorInterface) {
     .ProcessPacket = (void (*)(void *, Packet *)) reporter_ProcessPacket,
     .Finalize = NULL,
 };
+
+Processor *
+reporter_AsProcessor(Reporter *reporter)
+{
+    Processor *processor = processor_Create(reporter, ReporterAsProcessor);
+    return processor;
+}

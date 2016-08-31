@@ -60,6 +60,7 @@ main(int argc, char **argv)
 
     static struct option longopts[] = {
         { "output_mode",    required_argument, NULL, 'm' },
+        { "digest",         required_argument, NULL, 'd' },
         { "capture",        required_argument, NULL, 'c' },
         { "traffic_filter", required_argument, NULL, 't' },
         { "input_file",     required_argument, NULL, 'i' },
@@ -68,7 +69,7 @@ main(int argc, char **argv)
         { NULL,             0,                 NULL, 0   }
     };
 
-    while ((value = getopt_long(argc, argv, "m:c:t:f:i:h", longopts, NULL)) != -1) {
+    while ((value = getopt_long(argc, argv, "m:c:t:f:i:hd:", longopts, NULL)) != -1) {
         switch (value) {
             case 'm':
                 cvalue = optarg;
@@ -126,41 +127,50 @@ main(int argc, char **argv)
     }
 #endif
 
-    Reporter *reporter = NULL;
-    switch (outputFormat) {
-        case _OutputFormat_Raw:
-            reporter = reporter_CreateRawFileReporter(stdout);
-            break;
-        case _OutputFormat_JSON:
-            reporter = reporter_CreateJSONFileReporter(stdout);
-            break;
-        case _OutputFormat_CSV:
-            reporter = reporter_CreateCSVFileReporter(stdout);
-            break;
-        default:
-            fprintf(stderr, "Report output format not implemented.\n");
-            _showUsage(argv[0]);
-            exit(-1);
-    }
+    Processor *packetProcessor = NULL;
+    if (digestFlag) {
+        Digester *digester = digester_Create(digestAlg);
+        packetProcessor = digester_AsProcessor(digester);
+    } else {
+        Reporter *reporter = NULL;
+        switch (outputFormat) {
+            case _OutputFormat_Raw:
+                reporter = reporter_CreateRawFileReporter(stdout);
+                break;
+            case _OutputFormat_JSON:
+                reporter = reporter_CreateJSONFileReporter(stdout);
+                break;
+            case _OutputFormat_CSV:
+                reporter = reporter_CreateCSVFileReporter(stdout);
+                break;
+            default:
+                fprintf(stderr, "Report output format not implemented.\n");
+                _showUsage(argv[0]);
+                exit(-1);
+        }
+        
+        for (int i = 0; i < numFilters; i++) {
+            reporter_AddFilterByString(reporter, filters[i]);
+        }
 
-    for (int i = 0; i < numFilters; i++) {
-        reporter_AddFilterByString(reporter, filters[i]);
+        packetProcessor = reporter_AsProcessor(reporter);
     }
 
     if (liveMode) {
-        captureFromDevice(reporter, deviceString, filterString);
+        captureFromDevice(packetProcessor, deviceString, filterString);
     } else if (fileMode) {
         FILE *inputFile = fopen(fileName, "rb");
         if (inputFile != NULL) {
-            captureFromFile(reporter, inputFile);
+            captureFromFile(packetProcessor, inputFile);
             fclose(inputFile);
         } else {
             fprintf(stderr, "Error: unable to open %s for reading\n", fileName);
         }
     } else {
-        captureFromFile(reporter, stdin);
+        captureFromFile(packetProcessor, stdin);
     }
 
-    reporter_Destroy(&reporter);
+    // XXX: free up memory
+    //processor_Destroy(&reporter);
 }
 

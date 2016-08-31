@@ -8,7 +8,7 @@
 #define BUFFER_SIZE 64000
 
 int
-captureFromDevice(Reporter *reporter, char *device, char *filter)
+captureFromDevice(Processor *processor, char *device, char *filter)
 {
     // http://www.manpagez.com/man/7/pcap-filter/
     // http://www.tcpdump.org/pcap.html
@@ -49,14 +49,14 @@ captureFromDevice(Reporter *reporter, char *device, char *filter)
         Packet *packet = packet_CreateFromBuffer(packetBuffer);
 
         // Display the packet
-        packet_Report(packet, reporter);
+        processor_ProcessPacket(processor, packet);
     }
 
     return 0;
 }
 
 int
-captureFromFile(Reporter *reporter, FILE *file)
+captureFromFile(Processor *processor, FILE *file)
 {
     // The buffer to store a single packet at a time (64KB is the max packet size).
     char buffer[BUFFER_SIZE];
@@ -76,7 +76,7 @@ captureFromFile(Reporter *reporter, FILE *file)
         Packet *packet = packet_CreateFromBuffer(packetBuffer);
 
         // Display the packet
-        packet_Report(packet, reporter);
+        processor_ProcessPacket(processor, packet);
         packet_Destroy(&packet);
         buffer_Destroy(&packetBuffer);
 

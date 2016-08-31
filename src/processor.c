@@ -23,9 +23,9 @@ processor_Init(Processor *proc)
 }
 
 void 
-processor_ProcessPacket(Processor *proc, Packet *packet)
+processor_ProcessPacket(Processor *proc, struct packet *thePacket)
 {
-    proc->interface->ProcessPacket(proc->instance, packet);
+    proc->interface->ProcessPacket(proc->instance, thePacket);
 }
 
 void 

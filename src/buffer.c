@@ -113,7 +113,7 @@ buffer_DisplayHex(Buffer *b, int indentation)
         printf("  ");
     }
     for (int i = 0; i < b->length; i++) {
-        printf("%c", b->bytes[i]);
+        printf("%x", b->bytes[i]);
     }
     printf("\n");
 }
@@ -177,15 +177,26 @@ buffer_Compare(Buffer *this, Buffer *other)
     }
 }
 
-size_t buffer_Size(Buffer *buffer)
+size_t buffer_Size(const Buffer *buffer)
 {
     return buffer->length;
 }
 
 uint8_t *
-buffer_Overlay(Buffer *buffer)
+buffer_Overlay(const Buffer *buffer)
 {
     return buffer->bytes;
+}
+
+Buffer *
+buffer_Slice(const Buffer *buffer, size_t offset, size_t length)
+{
+    if (offset + length > buffer->length) {
+        return NULL;
+    }
+
+    Buffer *slice = buffer_CreateFromArray((buffer->bytes) + offset, length);
+    return slice;
 }
 
 uint64_t

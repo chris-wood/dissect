@@ -1,4 +1,7 @@
 #include "digester.h"
+#include "buffer.h"
+
+#include "lib-sha256.h"
 
 struct digester {
     DigestAlgorithm alg;
@@ -15,10 +18,28 @@ digester_Create(DigestAlgorithm alg)
 }
 
 void 
-digester_ProcessPacket(Reporter *reporter, Packet *packet)
+digester_ProcessPacket(Digester *digester, Packet *packet)
 {
-    // 1. compute the digest
-    // 2. print the digest
+    Buffer *payload = packet_GetProtectedRegion(packet);
+    Buffer *md = NULL;
+    switch (digester->alg) {
+        case DigestAlgorithm_SHA256: {
+            md = SHA256(payload);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+    if (md != NULL) {
+        buffer_DisplayHex(md, 0);
+        buffer_Destroy(&md);
+    }
+
+    if (payload != NULL) {
+        buffer_Destroy(&payload);
+    }
 }
 
 ProcessorInterface *DigesterAsProcessor = &(ProcessorInterface) {
@@ -26,4 +47,11 @@ ProcessorInterface *DigesterAsProcessor = &(ProcessorInterface) {
     .ProcessPacket = (void (*)(void *, Packet *)) digester_ProcessPacket,
     .Finalize = NULL,
 };
+
+Processor *
+digester_AsProcessor(Digester *digester)
+{
+    Processor *processor = processor_Create(digester, DigesterAsProcessor);
+    return processor;
+}
 

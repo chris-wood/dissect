@@ -40,8 +40,9 @@ void buffer_Destroy(Buffer **bufferPtr);
 Buffer *buffer_Copy(Buffer *copy);
 int buffer_Compare(Buffer *this, Buffer *other);
 
-size_t buffer_Size(Buffer *buffer);
-uint8_t *buffer_Overlay(Buffer *buffer);
+size_t buffer_Size(const Buffer *buffer);
+uint8_t *buffer_Overlay(const Buffer *buffer);
+Buffer *buffer_Slice(const Buffer *buffer, size_t offset, size_t length);
 
 uint64_t buffer_GetUint64(Buffer *buffer, size_t offset);
 uint32_t buffer_GetUint32(Buffer *buffer, size_t offset);

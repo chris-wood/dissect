@@ -3,6 +3,7 @@
 
 #include "packet.h"
 #include "reporter.h"
+#include "digester.h"
 
 typedef enum {
     DigestAlgorithm_SHA256,
@@ -12,8 +13,7 @@ typedef enum {
 struct digester;
 typedef struct digester Digester;
 
-extern ProcessorInterface *DigesterAsProcessor;
-
 Digester *digester_Create(DigestAlgorithm alg);
+Processor *digester_AsProcessor(Digester *digester);
 
 #endif // dissect_digester_h_

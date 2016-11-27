@@ -47,7 +47,6 @@ endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 set(CMAKE_C_FLAGS_DEBUG_INIT "-g")
 
@@ -55,6 +54,7 @@ include_directories(src)
 
 add_library(libdissect ${SOURCE_FILES})
 set_property(TARGET libdissect PROPERTY C_STANDARD 99)
+
 add_executable(dissect src/dissect.c)
 target_link_libraries(dissect libdissect pcap m)
 set_property(TARGET dissect PROPERTY C_STANDARD 99)
